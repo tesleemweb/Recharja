@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Recharja Dashboard</title>
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+<div class="container" id="dashboard">
+  <!-- 🔔 Notification Banner -->
+  <div class="notif-banner" id="notifBanner">
+    <span id="bannerText">🚀 New update: Enjoy 2% cashback on all airtime purchases today!</span>
+    <button class="close-btn" id="closeNotif">✖</button>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <p id="userGreeting">Hi User</p>
+      <span class="badge">Available Balance</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div class="notif-wrapper" style="position:relative;">
+        <div class="notif-icon" id="notifIcon">🔔<span class="notif-count" id="notifCount">0</span></div>
+        <div class="notif-dropdown" id="notifDropdown">
+          <ul id="notifList"></ul>
+        </div>
+      </div>
+      <div class="avatar" id="avatar">U</div>
+    </div>
+  </div>
+
+  <!-- Balance -->
+  <div class="balance">
+    ₦<span id="balance">0.00</span>
+    <span id="toggleEye">🙈</span>
+  </div>
+  <button id="fundWalletBtn" class="btn">+ Fund Wallet</button>
+
+  <!-- Banner -->
+  <div class="banner">
+    <div>
+      <p class="app-name">Recharja</p>
+      <p style="margin:4px 0 0; font-weight:bold;">Need Help With Anything?</p>
+      <p style="margin:0; font-size:14px;">Chat with support now</p>
+      <button id="supportBtn">Tap to chat</button>
+
+    </div>
+    <div class="banner-img"></div>
+  </div>
+
+  <!-- Quick Action -->
+  <h2>Quick Action</h2>
+  <div class="grid">
+    <div class="card-btn" data-target="data">📶 Data</div>
+    <div class="card-btn" data-target="airtime">📱 Airtime</div>
+    <div class="card-btn" data-target="cable">📺 Cable TV</div>
+  </div>
+
+  <!-- More Actions -->
+  <h2>More Actions</h2>
+  <div class="grid">
+    <div class="card-btn" data-target="menu">🧭 Menu</div>
+    <div class="card-btn" data-target="transactions">💳 Transactions</div>
+    <div class="card-btn" data-target="2fa">🔐 2FA</div>
+  </div>
+
+<!-- Recent Transactions -->
+<div class="section-header">
+  <h2>Recent Transactions</h2>
+  <button id="viewAllBtn" class="view-all-btn">View All</button>
+</div>
+<div id="transactions"></div>
+
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <div class="nav-item active"><span class="nav-icon">🏠</span>Home</div>
+  <div class="nav-item" data-target="menu"><span class="nav-icon">🧭</span>Menu</div>
+  <div class="nav-item" data-target="profile"><span class="nav-icon">👤</span>Profile</div>
+</div>
+
+
+<!-- 🌟 WELCOME OVERLAY -->
+<div id="welcomeOverlay" class="welcome-overlay hidden">
+  <div class="welcome-box">
+    <h2 id="welcomeTitle">Welcome to Recharja!</h2>
+    <p id="welcomeMessage">
+      Hi there, welcome aboard! Tap “Get Started” to explore our services.
+    </p>
+    <button id="welcomeBtn">Get Started</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/pulltorefreshjs@0.1.16/dist/index.umd.js"></script>
+<script src="config.js"></script>
+<script>
+/* -------------------------
+   GLOBAL STATE
+------------------------- */
+let walletBalance = 0;
+let notifications = [];
+let animateInterval = null;
+let currentAnimated = 0;
+
+/* -------------------------
+   HELPER: unified fetch
+------------------------- */
+const fetchJSON = async (url, options = {}) => {
+  const res = await fetch(url, { credentials: 'include', ...options });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(text || `Request failed (${res.status})`);
+  }
+  return res.json();
+};
+
+/* -------------------------
+   WALLET BALANCE ANIMATION
+------------------------- */
+const balanceEl = document.getElementById('balance');
+const updateWalletBalance = (balance = 0) => {
+  if (animateInterval) clearInterval(animateInterval);
+  currentAnimated = 0;
+  const steps = 50;
+  const stepVal = balance / steps;
+  animateInterval = setInterval(() => {
+    currentAnimated += stepVal;
+    if (currentAnimated >= balance) {
+      balanceEl.textContent = balance.toFixed(2);
+      clearInterval(animateInterval);
+      animateInterval = null;
+    } else balanceEl.textContent = currentAnimated.toFixed(2);
+  }, 12);
+};
+
+/* -------------------------
+   TRANSACTIONS RENDER
+------------------------- */
+const getServiceIcon = service => {
+  switch ((service || '').toLowerCase()) {
+    case 'airtime': return '📱';
+    case 'data': return '📶';
+    case 'electricity': return '⚡';
+    case 'cabletv':
+    case 'cable': return '📺';
+    default: return '🧾';
+  }
+};
+
+const cleanDescription = desc => (desc || '').replace(/₦[\d,\.]+/g, '').replace(/[-–—]+/g, '–').replace(/\s+/g, ' ').trim();
+
+const renderRecentTransactions = (transactions = []) => {
+  const container = document.getElementById('transactions');
+  container.innerHTML = '';
+  if (!transactions.length) {
+    container.innerHTML = `<div class="transaction"><div style="font-size:14px;">No transactions yet</div></div>`;
+    return;
+  }
+
+  transactions.slice(0,3).forEach(tx => {
+    const name = tx.description || tx.name || (tx.service ? `${tx.service} transaction` : 'Transaction');
+    const amount = Number(tx.amount || tx.value || 0);
+    const status = (tx.status || 'unknown').toLowerCase();
+    const when = tx.createdAt ? new Date(tx.createdAt).toLocaleString('en-NG', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true }) : (tx.time || '');
+    const icon = getServiceIcon(tx.service);
+
+    const div = document.createElement('div');
+    div.className = 'transaction';
+    div.innerHTML = `
+      <div class="transaction-header">
+        <p style="margin:0; font-size:14px;">${cleanDescription(name)}</p>
+        <p style="margin:0; font-weight:bold;">₦${amount.toFixed(2)}</p>
+      </div>
+      <p style="margin:0; font-size:12px; color:#94a3b8;">${icon} ${when}</p>
+      <span class="status ${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+    `;
+    div.style.cursor = 'pointer';
+    div.addEventListener('click', () => {
+      const id = tx._id || tx.id || '';
+      if (id) window.location.href = `receipt.html?id=${id}`;
+      else alert('Coming soon');
+    });
+    container.appendChild(div);
+  });
+};
+
+/* -------------------------
+   TRANSACTIONS PLACEHOLDERS
+------------------------- */
+function showTxPlaceholders(count = 3) {
+  const container = document.getElementById('transactions');
+  container.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const div = document.createElement('div');
+    div.className = 'transaction placeholder';
+    div.innerHTML = `
+      <div class="transaction-header">
+        <p style="width: 60%; height: 14px;"></p>
+        <span style="width: 20%; height: 14px;"></span>
+      </div>
+      <p style="width: 40%; height: 12px; margin-top:6px;"></p>
+      <span class="status pending" style="width: 25%; height: 12px; display:inline-block;"></span>
+    `;
+    container.appendChild(div);
+  }
+}
+
+/* -------------------------
+   DASHBOARD LOADER
+------------------------- */
+const loadDashboard = async () => {
+  try {
+    // Wallet
+    const wallet = await fetchJSON(`${BASE_URL}/api/wallet`).catch(() => ({ balance: 0 }));
+    walletBalance = wallet.balance || 0;
+    updateWalletBalance(walletBalance);
+
+    // Transactions
+    showTxPlaceholders(3);
+    const txRes = await fetchJSON(`${BASE_URL}/api/wallet/transactions`).catch(() => ({ transactions: [] }));
+    const transactions = (txRes.transactions || []).sort((a,b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id));
+    renderRecentTransactions(transactions.slice(0, 3));
+  } catch (err) {
+    console.error('⚠️ Dashboard load error:', err.message);
+    document.getElementById('transactions').innerHTML = `<div class="transaction"><div style="font-size:14px;">⚠️ Failed to load dashboard</div></div>`;
+  }
+};
+
+/* -------------------------
+   NOTIFICATIONS
+------------------------- */
+const notifIcon = document.getElementById('notifIcon');
+const notifDropdown = document.getElementById('notifDropdown');
+const notifListEl = document.getElementById('notifList');
+const notifCountEl = document.getElementById('notifCount');
+const notifBanner = document.getElementById('notifBanner');
+const closeNotif = document.getElementById('closeNotif');
+
+async function loadNotifications() {
+  try {
+    const res = await fetch(`${BASE_URL}/api/admin/notifications`, { credentials: 'include' });
+    const data = await res.json();
+    notifications = data.success && Array.isArray(data.notifications)
+      ? data.notifications.map(n => ({
+          id: n._id,
+          title: n.title || n.message || 'Notification',
+          message: n.message || '',
+          read: !!n.read,
+          date: n.date || n.createdAt,
+          category: n.category || ''
+        }))
+      : [];
+    updateNotifUI();
+    return data;
+  } catch (err) {
+    console.error('Error loading notifications:', err);
+    notifications = [];
+    updateNotifUI();
+  }
+}
+
+function updateNotifUI() {
+  const unread = notifications.filter(n => !n.read);
+  notifCountEl.textContent = unread.length || '0';
+  
+  const sorted = [...notifications].sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  notifListEl.innerHTML = sorted.length
+    ? sorted.map(n => `<li data-id="${n.id}" class="${!n.read ? 'unread' : 'read'}">${n.title}</li>`).join('')
+    : `<li class="empty">No notifications yet</li>`;
+}
+
+function checkWelcomeNotification(notifs = []) {
+  const welcome = notifs.find(n => n.category === 'welcome' && !n.read);
+  if (welcome) showWelcomeModal(welcome);
+}
+
+/* -------------------------
+   WELCOME MODAL HANDLER
+------------------------- */
+const welcomeOverlay = document.getElementById('welcomeOverlay');
+const welcomeTitle = document.getElementById('welcomeTitle');
+const welcomeMessage = document.getElementById('welcomeMessage');
+const welcomeBtn = document.getElementById('welcomeBtn');
+
+function showWelcomeModal(notif) {
+  welcomeTitle.textContent = notif.title || 'Welcome!';
+  welcomeMessage.textContent = notif.message || 'We’re happy to have you here.';
+  welcomeOverlay.classList.remove('hidden');
+
+// Immediately mark as read
+(async () => {
+    try {
+        await fetch(`${BASE_URL}/api/admin/notifications/mark-read`, {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ids: [notif.id || notif._id] })
+        });
+
+        // update local state immediately
+        notif.read = true;
+        updateNotifUI();
+    } catch (err) {
+        console.warn('Could not mark welcome as read:', err);
+    }
+})();
+
+
+  // Button just closes modal and redirects
+  welcomeBtn.onclick = () => {
+    welcomeOverlay.classList.add('hidden');
+    window.location.href = 'menu';
+  };
+}
+
+
+/* -------------------------
+   FUND WALLET
+------------------------- */
+const fundWallet = async () => {
+  const raw = prompt('Enter amount to fund (₦):');
+  const amt = parseFloat(raw);
+  if (!amt || amt < 100) return alert('⚠️ Minimum funding is ₦100');
+  try {
+    const init = await fetchJSON(`${BASE_URL}/api/wallet/fund`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({amount: amt})
+    });
+    if (!init.authorization_url) throw new Error(init.msg || 'Missing payment URL');
+    window.location.href = init.authorization_url;
+  } catch (err) {
+    console.error('💳 Funding error:', err.message);
+    alert('❌ Payment initiation failed.');
+  }
+};
+
+/* -------------------------
+   AUTH + UI INIT
+------------------------- */
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!BASE_URL) console.warn('BASE_URL is empty. Set it in config.js');
+
+  try {
+    // Auth check + dashboard
+    const res = await fetch(`${BASE_URL}/api/auth/me`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Not authenticated');
+    const me = await res.json();
+    const user = me.user;
+    document.getElementById('userGreeting').textContent = `Hi there, ${user.name || user.email || 'User'}`;
+    document.getElementById('avatar').textContent = (user.name || 'U').charAt(0).toUpperCase();
+
+    await loadDashboard();
+    const data = await loadNotifications();
+    checkWelcomeNotification(data?.notifications || []);
+    setInterval(loadNotifications, 30000);
+
+  } catch (err) {
+    console.warn('⛔ Auth check failed:', err.message);
+    window.location.href = 'login';
+  }
+
+  // Nav
+  document.querySelectorAll('.nav-item').forEach(item => item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    const t = item.dataset.target;
+    if (t) window.location.href = t;
+  }));
+
+  // Cards
+  document.querySelectorAll('.card-btn').forEach(btn => btn.addEventListener('click', () => {
+    const target = btn.dataset.target; 
+    if (target) window.location.href = target; 
+    else alert('Coming soon');
+  }));
+
+  // Support
+  const supportBtn = document.getElementById('supportBtn');
+  supportBtn?.addEventListener('click', () => window.location.href='https://wa.me/qr/4QLKTIOQTOIFM1');
+
+  // Fund wallet
+  const fundBtn = document.getElementById('fundWalletBtn');
+  fundBtn?.addEventListener('click', fundWallet);
+
+  // Balance eye toggle
+  const toggleEye = document.getElementById('toggleEye');
+  toggleEye?.addEventListener('click', () => {
+    let hidden = toggleEye.dataset.hidden === 'true';
+    hidden = !hidden;
+    toggleEye.dataset.hidden = hidden;
+    if (hidden) balanceEl.textContent='****', toggleEye.textContent='👁️';
+    else toggleEye.textContent='🙈', updateWalletBalance(walletBalance);
+  });
+
+  // Notification banner
+  closeNotif?.addEventListener('click', () => notifBanner.style.display='none');
+  setTimeout(() => { if (notifBanner) notifBanner.style.display='none'; }, 8000);
+
+  // Notification dropdown
+  if (notifIcon && notifDropdown) {
+    notifIcon.addEventListener('click', () => {
+      notifDropdown.style.display = notifDropdown.style.display==='block'?'none':'block';
+    });
+    window.addEventListener('click', e => {
+      if (!notifIcon.contains(e.target) && !notifDropdown.contains(e.target)) notifDropdown.style.display='none';
+    });
+
+    notifListEl?.addEventListener('click', async e => {
+      const li = e.target.closest('li');
+      if (!li) return;
+      const notifId = li.dataset.id;
+      await fetch(`${BASE_URL}/api/admin/notifications/mark-read`, {
+        method:'PATCH', credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ids:[notifId]})
+      });
+      window.location.href = `notifications.html?notif=${notifId}`;
+    });
+  }
+
+  // View all transactions
+  const viewAllBtn = document.getElementById('viewAllBtn');
+  viewAllBtn?.addEventListener('click', () => window.location.href='transactions');
+});
+
+PullToRefresh.init({
+  mainElement: '#dashboard', // wrap your dashboard content in a container with id="dashboard"
+  onRefresh() {
+    return new Promise(async (resolve) => {
+      try {
+        await loadDashboard(); // your existing function
+        resolve();
+      } catch (err) {
+        console.error('Pull-to-refresh failed', err);
+        resolve();
+      }
+    });
+  },
+  instructionsPullToRefresh: 'Pull down to refresh',
+  instructionsReleaseToRefresh: 'Release to refresh',
+  instructionsRefreshing: 'Refreshing...'
+});
+
+</script>
+
+</body>
+</html>
