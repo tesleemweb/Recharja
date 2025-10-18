@@ -1,0 +1,26 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*.html",
+      "destination": "/:path*",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/dashboard.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/airtime", "destination": "/airtime.html" },
+    { "source": "/data", "destination": "/data.html" },
+    { "source": "/fail", "destination": "/fail.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/menu", "destination": "/menu.html" },
+    { "source": "/notifications", "destination": "/notifications.html" },
+    { "source": "/personal-info", "destination": "/personal-info.html" },
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/receipt", "destination": "/receipt.html" },
+    { "source": "/sign-up", "destination": "/sign-up.html" },
+    { "source": "/success", "destination": "/success.html" },
+    { "source": "/transactions", "destination": "/transactions.html" },
+    { "source": "/verify-payment", "destination": "/verify-payment.html" }
+  ]
+}

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up - Recharja</title>
+<link rel="stylesheet" href="css/sign-up.css">
+</head>
+<body>
+<!-- Animated background -->
+<div class="bg-animation">
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+</div>
+
+<div class="container">
+  <!-- Logo Section -->
+  <div class="logo-section">
+  <div class="app-logo">
+    <img src="assets/logo.png" alt="Recharja Logo">
+  </div>
+    <h1 class="app-name">Recharja</h1>
+    <p class="subtitle">Create your account to get started</p>
+  </div>
+
+  <!-- Step Indicator -->
+  <div class="steps">
+    <div class="step active" id="step1"></div>
+    <div class="step" id="step2"></div>
+    <div class="step" id="step3"></div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- Step 1: Email & Name -->
+  <form id="signupForm" class="signup-step">
+    <div class="form-group">
+      <label for="fullName">Full Name</label>
+      <input type="text" id="fullName" placeholder="John Doe" required>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" placeholder="john@example.com" required>
+    </div>
+
+    <div class="form-group password-group">
+  <label for="password">Password</label>
+  <div class="password-wrapper">
+    <input type="password" id="password" placeholder="Min. 8 characters" required>
+    <span class="toggle-password" onclick="togglePassword('password', this)">👁️</span>
+  </div>
+</div>
+
+<div class="form-group password-group">
+  <label for="confirmPassword">Confirm Password</label>
+  <div class="password-wrapper">
+    <input type="password" id="confirmPassword" placeholder="Re-enter password" required>
+    <span class="toggle-password" onclick="togglePassword('confirmPassword', this)">👁️</span>
+  </div>
+</div>
+
+    <button type="submit" class="btn" id="sendOtpBtn">
+      Continue
+    </button>
+
+    <div class="login-link">
+      Already have an account? <a href="login">Login</a>
+    </div>
+  </form>
+
+  <!-- Step 2: OTP Verification -->
+  <div id="otpStep" class="hidden">
+    <div class="info-msg">
+      We've sent a 6-digit code to <strong id="emailDisplay"></strong>
+    </div>
+
+    <label style="text-align: center; display: block; margin-bottom: 16px;">Enter Verification Code</label>
+    
+    <div class="otp-container">
+      <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+      <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+      <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+      <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+      <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+      <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+    </div>
+    
+    <button class="btn" id="verifyOtpBtn">
+      Verify & Continue
+    </button>
+
+    <button class="btn btn-secondary" id="backBtn">
+      Back
+    </button>
+
+    <div class="resend-text">
+      Didn't receive code? <span class="resend-link disabled" id="resendLink">Resend in <span id="timer">60</span>s</span>
+    </div>
+  </div>
+
+  <!-- Step 3: Success -->
+  <div id="successStep" class="hidden">
+    <div class="success-msg" style="display: block;">
+      <div class="success-icon">✓</div>
+      <h2 style="margin-bottom: 12px; font-size: 24px;">Account Created!</h2>
+      <p style="color: #94a3b8; margin-bottom: 24px;">
+        Welcome to Recharja! Your account has been successfully verified.
+      </p>
+      <button class="btn" id="goToDashboard">
+        Go to Dashboard
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+let currentStep = 1;
+let userData = {};
+let resendTimer = 60;
+let timerInterval;
+
+// DOM elements
+const signupForm = document.getElementById('signupForm');
+const otpStep = document.getElementById('otpStep');
+const successStep = document.getElementById('successStep');
+const errorMsg = document.getElementById('errorMsg');
+const sendOtpBtn = document.getElementById('sendOtpBtn');
+const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+const backBtn = document.getElementById('backBtn');
+const resendLink = document.getElementById('resendLink');
+const timerSpan = document.getElementById('timer');
+const otpInputs = document.querySelectorAll('.otp-input');
+
+// Step indicators
+const step1 = document.getElementById('step1');
+const step2 = document.getElementById('step2');
+const step3 = document.getElementById('step3');
+
+// Show error message
+function showError(message) {
+  errorMsg.textContent = message;
+  errorMsg.style.display = 'block';
+  setTimeout(() => errorMsg.style.display = 'none', 5000);
+}
+
+// Update step indicator
+function updateSteps(step) {
+  step1.classList.toggle('active', step >= 1);
+  step2.classList.toggle('active', step >= 2);
+  step3.classList.toggle('active', step >= 3);
+}
+
+function startResendTimer() {
+  resendTimer = 60;
+  resendLink.classList.add('disabled');
+  timerSpan.textContent = resendTimer;
+
+  timerInterval = setInterval(() => {
+    resendTimer--;
+    timerSpan.textContent = resendTimer;
+
+    if (resendTimer <= 0) {
+      clearInterval(timerInterval);
+      resendLink.classList.remove('disabled');
+      timerSpan.textContent = '';
+    }
+  }, 1000);
+}
+
+
+// Send OTP
+signupForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const fullName = document.getElementById('fullName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const username = email.split('@')[0]; // use part of email as username
+
+  if (!fullName || !email || !password) {
+    showError('Please fill in all fields');
+    return;
+  }
+  if (password.length < 6) {
+    showError('Password must be at least 6 characters');
+    return;
+  }
+
+  userData = { name: fullName, email, username, password };
+
+  sendOtpBtn.innerHTML = '<span class="spinner"></span>Sending OTP...';
+  sendOtpBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/send-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showError(data.msg || 'Failed to send OTP');
+      sendOtpBtn.innerHTML = 'Continue';
+      sendOtpBtn.disabled = false;
+      return;
+    }
+
+    signupForm.classList.add('hidden');
+    otpStep.classList.remove('hidden');
+    document.getElementById('emailDisplay').textContent = email;
+    currentStep = 2;
+    updateSteps(2);
+    startResendTimer();
+    otpInputs[0].focus();
+
+  } catch (err) {
+    console.error(err);
+    showError('Server error. Please try again.');
+  } finally {
+    sendOtpBtn.innerHTML = 'Continue';
+    sendOtpBtn.disabled = false;
+  }
+});
+
+// Verify OTP
+verifyOtpBtn.addEventListener('click', async () => {
+  const otp = Array.from(otpInputs).map(i => i.value).join('');
+  if (otp.length !== 6) {
+    showError('Please enter the complete 6-digit code');
+    return;
+  }
+
+  verifyOtpBtn.innerHTML = '<span class="spinner"></span>Verifying...';
+  verifyOtpBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ ...userData, otp })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showError(data.msg || 'OTP verification failed');
+      return;
+    }
+
+    otpStep.classList.add('hidden');
+    successStep.classList.remove('hidden');
+    currentStep = 3;
+    updateSteps(3);
+    clearInterval(timerInterval);
+
+  } catch (err) {
+    console.error(err);
+    showError('Server error. Please try again.');
+  } finally {
+    verifyOtpBtn.innerHTML = 'Verify & Continue';
+    verifyOtpBtn.disabled = false;
+  }
+});
+
+// Resend OTP
+resendLink.addEventListener('click', async () => {
+  if (!resendLink.classList.contains('disabled')) {
+    resendLink.classList.add('disabled');
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/resend-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userData.email })
+      });
+      const data = await res.json();
+      if (!res.ok) showError(data.msg || 'Failed to resend OTP');
+      else showError('✓ New code sent to your email');
+
+      otpInputs.forEach(i => i.value = '');
+      otpInputs[0].focus();
+      startResendTimer();
+    } catch (err) {
+      console.error(err);
+      showError('Server error. Please try again.');
+    }
+  }
+});
+
+backBtn.addEventListener('click', () => {
+  // Hide OTP step
+  otpStep.classList.add('hidden');
+  // Show signup form
+  signupForm.classList.remove('hidden');
+  // Update step indicators
+  currentStep = 1;
+  updateSteps(1);
+  // Stop the resend timer if it’s running
+  clearInterval(timerInterval);
+});
+
+
+// Toggle password visibility
+function togglePassword(id, el) {
+  const input = document.getElementById(id);
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  el.textContent = isHidden ? '🙈' : '👁️';
+}
+
+
+// ===============================
+// OTP INPUT HANDLERS
+// ===============================
+otpInputs.forEach((input, index) => {
+  // Allow only numeric input and auto-move to next box
+  input.addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/\D/g, ''); // remove non-digits
+    if (e.target.value && index < otpInputs.length - 1) {
+      otpInputs[index + 1].focus();
+    }
+  });
+
+  // Move back on backspace if empty
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+      otpInputs[index - 1].focus();
+    }
+  });
+
+  // Handle paste (allow full OTP paste)
+  input.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, otpInputs.length);
+    pasted.split('').forEach((char, i) => {
+      otpInputs[i].value = char;
+    });
+    otpInputs[Math.min(pasted.length, otpInputs.length - 1)].focus();
+  });
+});
+
+
+// Go to dashboard
+document.getElementById('goToDashboard').addEventListener('click', () => {
+  window.location.href = 'dashboard'; // replace with your dashboard route
+});
+</script>
+</body>
+</html>

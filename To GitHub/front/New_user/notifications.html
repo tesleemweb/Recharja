@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications - Recharja</title>
+<link rel="stylesheet" href="css/notification.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-title">Notifications</div>
+      <div class="header-actions">
+        <button class="mark-all-btn" id="markAllBtn">Mark all read</button>
+        <div class="settings-icon" id="settingsBtn">⚙️</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Filter Tabs Container -->
+    <div class="filter-tabs-container">
+      <div class="filter-tabs">
+        <div class="filter-tab active" data-filter="all">
+          All <span class="tab-count" id="countAll">12</span>
+        </div>
+        <div class="filter-tab" data-filter="unread">
+          Unread <span class="tab-count" id="countUnread">5</span>
+        </div>
+        <div class="filter-tab" data-filter="transaction">
+          Transactions
+        </div>
+        <div class="filter-tab" data-filter="promotion">
+          Promotions
+        </div>
+        <div class="filter-tab" data-filter="security">
+          Security
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🔔</div>
+      <div class="empty-text">No notifications yet</div>
+      <div class="empty-subtext">When you receive notifications, they'll appear here</div>
+    </div>
+
+    <!-- Notifications List -->
+    <div id="notificationsList"></div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="navigate('dashboard')">
+      <span class="nav-icon">🏠</span>Home
+    </div>
+    <div class="nav-item" onclick="navigate('menu')">
+      <span class="nav-icon">🧭</span>Menu
+    </div>
+    <div class="nav-item" onclick="navigate('profile')">
+      <span class="nav-icon">👤</span>Profile
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="settings-overlay" id="settingsOverlay"></div>
+  <div class="settings-modal" id="settingsModal">
+    <div class="settings-header">
+      <div style="width: 100%;">
+        <div class="settings-handle"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="settings-title">Notification Settings</div>
+          <button class="close-settings" id="closeSettings">✕</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="settings-body">
+      <!-- Push Notifications -->
+      <div class="settings-section">
+        <div class="settings-section-title">Push Notifications</div>
+        
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">All Notifications</div>
+            <div class="settings-item-desc">Receive all notification types</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleAll" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Transaction Alerts</div>
+            <div class="settings-item-desc">Get notified about payments and purchases</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleTransaction" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Promotions & Offers</div>
+            <div class="settings-item-desc">Special deals and cashback alerts</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="togglePromotion" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Security Alerts</div>
+            <div class="settings-item-desc">Login attempts and account activity</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleSecurity" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Other Settings -->
+      <div class="settings-section">
+        <div class="settings-section-title">Preferences</div>
+        
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Sound</div>
+            <div class="settings-item-desc">Play sound for new notifications</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleSound" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Vibration</div>
+            <div class="settings-item-desc">Vibrate on new notifications</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleVibration" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Email Notifications</div>
+            <div class="settings-item-desc">Receive important alerts via email</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleEmail">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+<script src="js/config.js"></script>
+<script src="js/notification.js"></script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+  /* ========== Base ========== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root{
+    --bg:#0f172a;               /* page background */
+    --card:#0f172a;             /* card / input base */
+    --panel:#111827;            /* slightly lighter panel */
+    --card-2:#1e293b;          /* elevated card */
+    --muted:#94a3b8;           /* muted text */
+    --text:#f8fafc;            /* primary text */
+    --accent:#2563eb;          /* primary accent */
+    --accent-2:#1d4ed8;        /* accent hover */
+    --accent-gradient: linear-gradient(135deg,#2563eb,#1d4ed8);
+    --success:#22c55e;
+    --danger:#ef4444;
+    --border:#334155;
+    --glass: rgba(255,255,255,0.02);
+  }
+
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 90px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* ========== Header ========== */
+  .header{
+    background: linear-gradient(180deg, rgba(17,24,39,0.9) 0%, rgba(30,41,59,0.95) 100%);
+    padding: 16px 20px;
+    display:flex; justify-content:space-between; align-items:center;
+    position:sticky; top:0; z-index:100;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+    backdrop-filter: blur(6px);
+  }
+
+  .header-left{ display:flex; align-items:center; gap:12px; }
+
+  .back-btn{
+    width:40px; height:40px; border-radius:10px;
+    background: var(--panel); border: none; color:var(--text);
+    font-size:20px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition: all .22s ease;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+  }
+  .back-btn:hover{ background:var(--border); transform: translateX(-2px); }
+
+  .header-title{ font-size:20px; font-weight:700; color:var(--text); }
+
+  .edit-toggle{
+    background:var(--accent); color:white; border:none; padding:10px 24px;
+    border-radius:10px; font-weight:600; font-size:14px; cursor:pointer;
+    transition: all .18s ease;
+    box-shadow: 0 8px 22px rgba(37,99,235,0.12);
+  }
+  .edit-toggle:hover{ background:var(--accent-2); transform: scale(1.03); }
+  .edit-toggle.save-mode{ background: var(--success); box-shadow: 0 8px 22px rgba(34,197,94,0.12); }
+
+  /* ========== Layout container ========== */
+  .content{ max-width: 900px; margin: 20px auto; padding: 0 20px; }
+
+  /* ========== KYC Tier Section (kept from original) ========== */
+  .kyc-tier-section{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:16px; padding:20px; margin-bottom:20px;
+    box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    border: 1px solid rgba(255,255,255,0.02);
+  }
+  .current-tier { margin-bottom: 12px; }
+  .tier-badge{
+    display:inline-block; padding:8px 16px; border-radius:20px; font-weight:700; font-size:14px;
+    background: linear-gradient(135deg,#2563eb,#1d4ed8); color: white;
+  }
+  .tier-badge.tier-2{ background: linear-gradient(135deg,#f093fb,#f5576c); }
+  .tier-badge.tier-3{ background: linear-gradient(135deg,#ffd89b,#19547b); }
+
+  .tier-limits{
+    background: rgba(255,255,255,0.01); padding:14px; border-radius:10px; font-size:14px; line-height:1.6; color:var(--muted);
+    margin-bottom:14px; border:1px solid rgba(255,255,255,0.02);
+  }
+
+  .upgrade-btn{
+    width:100%; padding:14px; border-radius:10px; font-weight:700; font-size:15px; cursor:pointer;
+    border:none; color:white; background: linear-gradient(135deg,#f093fb,#f5576c);
+    box-shadow: 0 10px 30px rgba(245,87,108,0.12);
+    transition: all .18s ease;
+  }
+  .upgrade-btn:hover{ transform: translateY(-3px); }
+
+  /* ========== Profile Picture Section ========== */
+  .profile-picture-section{
+    background: var(--card-2); border-radius:16px; padding:30px 20px; text-align:center; margin-bottom:20px;
+    box-shadow: 0 8px 28px rgba(2,6,23,0.6);
+  }
+  .avatar-container{ display:inline-block; position:relative; margin-bottom:16px; }
+
+  .avatar-display{
+    width:120px; height:120px; border-radius:50%;
+    background: var(--accent-gradient); display:flex; align-items:center; justify-content:center;
+    font-size:48px; font-weight:700; color:white; position:relative; cursor:pointer; transition: all .2s;
+    box-shadow: 0 12px 34px rgba(37,99,235,0.18);
+  }
+  .avatar-display:hover{ transform: scale(1.04); }
+
+  .avatar-overlay{
+    position:absolute; top:0; left:0; right:0; bottom:0; border-radius:50%;
+    background: rgba(0,0,0,0.55); display:flex; align-items:center; justify-content:center;
+    color: #fff; font-weight:600; opacity:0; transition:opacity .18s;
+  }
+  .avatar-display:hover .avatar-overlay{ opacity:1; }
+
+  .change-photo-btn{
+    background: var(--accent); color:white; padding:12px 24px; border-radius:10px; border:none; cursor:pointer;
+  }
+  .change-photo-btn:hover{ background:var(--accent-2); transform: translateY(-2px); }
+
+  .verification-status{ display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; margin-top:8px; }
+  .verification-status.verified{ background: rgba(34,197,94,0.12); color: var(--success); }
+  .verification-status.unverified{ background: rgba(254, 226, 226, 0.06); color: #fb923c; }
+
+  /* ========== Form Sections ========== */
+  .form-section{ margin-bottom:20px; }
+  .form-section .card{ background: var(--card-2); border-radius:16px; padding:24px; box-shadow: 0 8px 28px rgba(2,6,23,0.6); border:1px solid rgba(255,255,255,0.02); }
+
+  .section-header{
+    display:flex; align-items:center; gap:10px; font-size:18px; font-weight:700; color:var(--muted); margin-bottom:14px; text-transform: none;
+    padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.02);
+  }
+  .section-icon{ font-size:20px; }
+  .tier-required{ margin-left:auto; background: linear-gradient(135deg,#ffd89b,#19547b); color:#071123; padding:6px 12px; border-radius:12px; font-size:11px; font-weight:700; }
+
+  .form-group{ margin-bottom:18px; }
+  .form-label{ display:block; font-size:14px; font-weight:600; color:var(--muted); margin-bottom:8px; }
+  .required{ color:var(--danger); }
+
+  .input-wrapper{ position:relative; }
+  .form-input{
+    width:100%; padding:14px 16px; border-radius:10px; font-size:15px; color:var(--text);
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.015));
+    border: 2px solid var(--border); transition: all .16s ease;
+    font-family: inherit;
+  }
+  .form-input:focus{ outline:none; border-color: var(--accent); background: var(--card-2); box-shadow: 0 0 0 6px rgba(37,99,235,0.06); }
+  .form-input:disabled{ opacity:0.7; cursor:not-allowed; background: rgba(255,255,255,0.01); }
+  .form-input.locked{ background: rgba(255,255,255,0.005); border-color: rgba(255,255,255,0.02); }
+
+  .input-icon{ position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:18px; color:#64748b; }
+  .verified-icon{ color: var(--success); }
+
+  /* select dropdown caret */
+  select.form-input{ appearance:none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 9L1 4h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position: right 14px center; padding-right:42px; }
+
+  /* info / warning boxes */
+  .info-box{ display:flex; gap:12px; background: rgba(37,99,235,0.06); border-left:4px solid rgba(37,99,235,0.18); padding:14px; border-radius:8px; margin-top:12px; }
+  .info-box-icon{ font-size:18px; flex-shrink:0; }
+  .info-box-text{ font-size:13px; line-height:1.6; color:var(--muted); }
+
+  .warning-box{ background: rgba(245,158,11,0.04); border-left:4px solid rgba(245,158,11,0.18); }
+  .warning-box-text{ color:#f97316; }
+
+  /* ========== Buttons & Actions ========== */
+  .action-buttons{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:30px; }
+  .action-btn{ padding:16px; border:none; border-radius:10px; font-size:16px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition: all .16s ease; }
+
+  .btn-secondary{ background: rgba(255,255,255,0.02); color:var(--text); border:1px solid var(--border); }
+  .btn-secondary:hover{ background: rgba(255,255,255,0.03); transform: translateY(-2px); }
+
+  .btn-primary{ background: var(--accent-gradient); color:white; box-shadow: 0 10px 30px rgba(37,99,235,0.12); }
+  .btn-primary:hover{ background: var(--accent-2); transform: translateY(-2px); }
+  .btn-primary:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
+
+  /* spinner */
+  .spinner{ display:none; width:20px; height:20px; border:3px solid rgba(255,255,255,0.12); border-top-color: white; border-radius:50%; animation: spin .8s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  /* toast */
+  .toast{ position: fixed; top: 80px; right: 20px; background: #111827; color: var(--text); padding:12px 18px; border-radius:10px; box-shadow: 0 12px 40px rgba(2,6,23,0.6); font-weight:600; transform: translateX(400px); opacity:0; transition: all .36s cubic-bezier(.2,.9,.2,1); z-index:1200; max-width:360px; }
+  .toast.show{ transform: translateX(0); opacity:1; }
+  .toast.error{ background: linear-gradient(90deg, rgba(239,68,68,0.12), rgba(239,68,68,0.06)); color: var(--danger); border-left:4px solid var(--danger); }
+
+  /* small helpers */
+  .form-group.locked-group{ opacity:0.75; }
+  .char-counter{ font-size:11px; color:#64748b; text-align:right; margin-top:6px; }
+
+  /* responsive */
+  @media (max-width: 768px){
+    .content{ padding: 0 16px; }
+    .action-buttons{ grid-template-columns: 1fr; }
+    .section-header{ flex-wrap:wrap; }
+    .tier-required{ margin-left:0; margin-top:8px; }
+  }
+  @media (max-width: 420px){ .header-title{ font-size:18px; } }
+
+
+  /* ---------- Mobile compacting for KYC + Avatar (paste at end of stylesheet) ---------- */
+@media (max-width: 480px) {
+  /* Reduce content side padding so cards use more width */
+  .content { padding: 0 12px; }
+
+  /* Make KYC + avatar visually connected:
+     - smaller paddings
+     - less vertical margin
+  */
+  .kyc-tier-section {
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+  }
+  .tier-limits { font-size: 13px; padding: 10px; line-height: 1.4; }
+
+  /* Make the upgrade button shorter but still tappable */
+  .upgrade-btn {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  /* Profile section compressed */
+  .profile-picture-section {
+    padding: 14px 12px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+  }
+
+  /* Shrink avatar so it doesn't dominate screen */
+  .avatar-display {
+    width: 88px;
+    height: 88px;
+    font-size: 28px;
+    box-shadow: 0 10px 28px rgba(37,99,235,0.12);
+  }
+
+  /* Slight overlap: pull profile up so avatar visually links with the KYC card */
+  /* If you don't want overlap, remove the margin-top rule below. */
+  .profile-picture-section { margin-top: -10px; }
+
+  /* Move avatar and text into a flexible row inside profile card */
+  .profile-picture-section .avatar-container { margin: 0; }
+  .profile-picture-section .verification-status { margin-top: 10px; padding: 6px 10px; font-size: 12px; }
+
+  /* Make the KYC and profile feel like a single compact block by removing double spacing */
+  .kyc-tier-section + .profile-picture-section { margin-top: -6px; }
+
+  /* Reduce form card paddings for denser layout */
+  .form-section .card { padding: 16px; border-radius: 12px; }
+
+  /* Reduce form-input vertical paddings slightly to show more fields */
+  .form-input { padding: 12px 14px; font-size: 14px; border-radius: 10px; }
+
+  /* Keep buttons tappable but smaller visually */
+  .action-btn { padding: 12px; font-size: 15px; border-radius: 10px; }
+
+  /* Reduce spacing of section headers */
+  .section-header { margin-bottom: 10px; font-size: 15px; padding-bottom: 6px; }
+
+  /* Optional: make the tier-badge and upgrade appear side-by-side on mobile */
+  .current-tier { display:flex; gap:8px; align-items:center; justify-content:flex-start; flex-wrap:wrap; }
+  .tier-badge { padding:6px 10px; font-size:13px; border-radius:14px; }
+
+  /* Make toast not cover too much on small screens */
+  .toast { left: 12px; right: 12px; transform: translateX(0) translateY(100px); max-width: none; bottom: 20px; top: auto; }
+}
+
+
+/* ----- Merge KYC + Profile visually ----- */
+.kyc-tier-section {
+  margin-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.profile-picture-section {
+  margin-top: -8px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border: 1px solid rgba(255,255,255,0.02);
+  background: linear-gradient(180deg, var(--card-2) 0%, var(--panel) 100%);
+}
+
+.section-header {
+  font-size: 16px;
+  letter-spacing: 0.2px;
+}
+.form-label {
+  font-size: 13px;
+}
+.tier-limits {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+
+.upgrade-btn {
+  background: linear-gradient(90deg, #f093fb, #f5576c);
+  box-shadow: 0 6px 16px rgba(245,87,108,0.2);
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+
+@media (max-width: 480px) {
+  .form-group { margin-bottom: 12px; }
+  .form-section .card { padding: 14px; }
+  .form-input { padding: 10px 12px; }
+}
+
+.header {
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+* {
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.kyc-tier-section, .profile-picture-section {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+  /* Bottom Navigation */
+  .bottom-nav { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    right: 0; 
+    background: #0f172a; 
+    display: flex; 
+    justify-content: space-around; 
+    padding: 10px 0; 
+    border-top: 1px solid #1e293b; 
+  }
+  .nav-item { 
+    text-align: center; 
+    font-size: 12px; 
+    color: #94a3b8; 
+    cursor: pointer;
+    padding: 8px 20px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  .nav-item.active { 
+    color: #2563eb; 
+    background: rgba(37, 99, 235, 0.1);
+    transform: translateY(-2px);
+  }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 3px;
+    background: #2563eb;
+    border-radius: 0 0 3px 3px;
+  }
+  .nav-icon { 
+    font-size: 20px; 
+    margin-bottom: 4px; 
+    display: block; 
+    transition: transform 0.3s ease;
+  }
+  .nav-item.active .nav-icon {
+    transform: scale(1.1);
+  }
+
+
+
+  /* -------------------------------
+   GLOBAL NATIVE-APP FEEL STYLING
+------------------------------- */
+
+/* Prevent text selection and long-press menus globally */
+body, html, #dashboard {
+  user-select: none;           /* Standard */
+  -webkit-user-select: none;   /* Safari/Chrome */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* IE */
+  -webkit-touch-callout: none; /* Disable long-press menu on iOS */
+  -webkit-user-drag: none;     /* Prevent image dragging */
+}
+
+/* Allow text selection in form fields */
+input, textarea {
+  user-select: text;         
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* Optional: prevent context menu everywhere except inputs/buttons */
+body {
+  -webkit-tap-highlight-color: transparent; /* Remove mobile highlight */
+}

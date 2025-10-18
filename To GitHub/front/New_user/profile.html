@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile - Recharja</title>
+<link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+    
+  <!-- Profile Hero -->
+  <div class="profile-hero">
+    <div class="avatar-wrapper">
+      <div class="avatar-large">H</div>
+      <div class="edit-avatar" onclick="editAvatar()">📷</div>
+    </div>
+    <div class="profile-name">Loading...</div>
+    <div class="profile-email">Loading...</div>
+    <div class="verified-badge">Checking...</div>
+    
+    <div class="profile-stats">
+      <div class="stat-item">
+        <span class="stat-value">--</span>
+        <span class="stat-label">Transactions</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">--</span>
+        <span class="stat-label">Total Spent</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">--</span>
+        <span class="stat-label">Referrals</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Referral Section -->
+    <div class="referral-card">
+      <div class="referral-title">🎁 Refer & Earn</div>
+      <div class="referral-desc">Share your code and get ₦500 for each friend who signs up!</div>
+      <div class="referral-code">
+        <span class="code-text">loading...</span>
+        <button class="copy-btn" onclick="copyCode()">Copy</button>
+
+        <!-- Referral Popup Notification -->
+        <div id="referralPopup" class="referral-popup"></div>
+      </div>
+    </div>
+
+    <!-- Account Settings -->
+    <div class="section">
+      <div class="section-title">Account Settings</div>
+      <div class="card">
+        <div class="menu-item" onclick="navigate('personal-info')">
+          <div class="menu-left">
+            <div class="menu-icon">👤</div>
+            <div class="menu-text">
+              <div class="menu-label">Personal Information</div>
+              <div class="menu-sublabel">Update your details</div>
+            </div>
+          </div>
+          <div class="menu-arrow">›</div>
+        </div>
+
+        <div class="menu-item" onclick="navigate('security')">
+          <div class="menu-left">
+            <div class="menu-icon">🔐</div>
+            <div class="menu-text">
+              <div class="menu-label">Security & Password</div>
+              <div class="menu-sublabel">2FA, PIN, Password</div>
+            </div>
+          </div>
+          <div class="menu-arrow">›</div>
+        </div>
+
+        <div class="menu-item" onclick="navigate('payment')">
+          <div class="menu-left">
+            <div class="menu-icon">💳</div>
+            <div class="menu-text">
+              <div class="menu-label">Payment Methods</div>
+              <div class="menu-sublabel">Manage cards & banks</div>
+            </div>
+          </div>
+          <div class="menu-arrow">›</div>
+        </div>
+
+        <div class="menu-item" id="settingsBtn">
+          <div class="menu-left">
+          <div class="menu-icon">🔔</div>
+          <div class="menu-text">
+            <div class="menu-label">Notifications</div>
+            <div class="menu-sublabel">Push, Email, SMS</div>
+          </div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Support & Legal -->
+    <div class="section">
+      <div class="section-title">Support & Legal</div>
+      <div class="card">
+        <div class="menu-item" onclick="navigate('help')">
+          <div class="menu-left">
+            <div class="menu-icon">❓</div>
+            <div class="menu-text">
+              <div class="menu-label">Help Center</div>
+              <div class="menu-sublabel">FAQs & Support</div>
+            </div>
+          </div>
+          <div class="menu-arrow">›</div>
+        </div>
+
+        <div class="menu-item" onclick="navigate('terms')">
+          <div class="menu-left">
+            <div class="menu-icon">📄</div>
+            <div class="menu-text">
+              <div class="menu-label">Terms & Privacy</div>
+              <div class="menu-sublabel">Legal information</div>
+            </div>
+          </div>
+          <div class="menu-arrow">›</div>
+        </div>
+
+        <div class="menu-item" onclick="navigate('about')">
+          <div class="menu-left">
+            <div class="menu-icon">ℹ️</div>
+            <div class="menu-text">
+              <div class="menu-label">About Recharja</div>
+              <div class="menu-sublabel">Version 2.5.0</div>
+            </div>
+          </div>
+          <div class="menu-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="action-btn btn-primary" onclick="editProfile()">✏️ Edit Profile</button>
+      <button class="action-btn btn-secondary" onclick="shareApp()">📤 Share App</button>
+    </div>
+
+    <button class="action-btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="logout()">🚪 Logout</button>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="navigate('home')">
+      <span class="nav-icon">🏠</span>Home
+    </div>
+    <div class="nav-item" onclick="navigate('menu')">
+      <span class="nav-icon">🧭</span>Menu
+    </div>
+    <div class="nav-item active">
+      <span class="nav-icon">👤</span>Profile
+    </div>
+  </div>
+
+
+  <!-- Settings Modal -->
+<div class="settings-overlay" id="settingsOverlay"></div>
+<div class="settings-modal" id="settingsModal">
+  <div class="settings-header">
+    <div style="width: 100%;">
+      <div class="settings-handle"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="settings-title">Notification Settings</div>
+        <button class="close-settings" id="closeSettings">✕</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="settings-body">
+    <!-- Push Notifications -->
+    <div class="settings-section">
+      <div class="settings-section-title">Push Notifications</div>
+      
+      <div class="settings-item">
+        <div class="settings-item-info">
+          <div class="settings-item-title">All Notifications</div>
+          <div class="settings-item-desc">Receive all notification types</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleAll" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-item">
+        <div class="settings-item-info">
+          <div class="settings-item-title">Transaction Alerts</div>
+          <div class="settings-item-desc">Get notified about payments and purchases</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleTransaction" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-item">
+        <div class="settings-item-info">
+          <div class="settings-item-title">Promotions & Offers</div>
+          <div class="settings-item-desc">Special deals and cashback alerts</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="togglePromotion" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-item">
+        <div class="settings-item-info">
+          <div class="settings-item-title">Security Alerts</div>
+          <div class="settings-item-desc">Login attempts and account activity</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleSecurity" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Preferences -->
+    <div class="settings-section">
+      <div class="settings-section-title">Preferences</div>
+      
+      <div class="settings-item">
+        <div class="settings-item-info">
+          <div class="settings-item-title">Sound</div>
+          <div class="settings-item-desc">Play sound for new notifications</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleSound" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-item">
+        <div class="settings-item-info">
+          <div class="settings-item-title">Vibration</div>
+          <div class="settings-item-desc">Vibrate on new notifications</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleVibration" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-item">
+        <div class="settings-item-info">
+          <div class="settings-item-title">Email Notifications</div>
+          <div class="settings-item-desc">Receive important alerts via email</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleEmail">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+  
+  <script src="js/config.js"></script>
+  <script>
+
+      let referralCode = '';
+
+    // Run when page loads
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/api/auth/me`, { credentials: 'include' });
+        const data = await res.json();
+
+        if (!data.success) {
+          window.location.href = 'login';
+          return;
+        }
+
+        const user = data.user;
+        document.querySelector('.profile-name').textContent = user.name;
+        document.querySelector('.profile-email').textContent = user.email;
+        document.querySelector('.avatar-large').textContent = user.name.charAt(0).toUpperCase();
+
+        // Verified badge
+        const badge = document.querySelector('.verified-badge');
+        if (user.verified) {
+          badge.textContent = '✓ Verified Account';
+          badge.style.color = '#10b981';
+        } else {
+          badge.textContent = 'Unverified Account';
+          badge.style.color = '#f87171';
+        }
+
+        // Stats
+        const stats = document.querySelectorAll('.stat-value');
+        stats[0].textContent = user.stats.transactions;
+        stats[1].textContent = formatNaira(user.stats.totalSpent);
+        stats[2].textContent = user.stats.referrals;
+        // === REFERRAL CODE === 
+        referralCode = user.referral?.code || '';
+        const codeEl = document.querySelector('.referral-code .code-text');
+        codeEl.textContent = referralCode.toUpperCase(); 
+
+      } catch (err) {
+        console.error('Error loading profile:', err);
+        window.location.href = 'login';
+      }
+    });
+
+function copyCode() {
+  const codeEl = document.querySelector('.referral-code .code-text'); // ✅ correct element
+  if (!codeEl) return;
+
+  const code = codeEl.textContent.toUpperCase();
+  navigator.clipboard.writeText(code);
+
+  showReferralPopup(
+    "✓ Referral code copied! 🎉\n" +
+    "Your referrals are tracked and will count toward future rewards. Stay tuned for exciting bonuses!"
+  );
+}
+
+
+
+
+    function formatNaira(amount) {
+      if (amount >= 1000) return `₦${(amount / 1000).toFixed(1)}K`;
+      return `₦${amount}`;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function navigate(page) {
+      switch(page) {
+        case 'home':
+          window.location.href = 'dashboard';
+          break;
+        case 'menu':
+          window.location.href = 'menu';
+          break;
+        case 'personal-info':
+          window.location.href = 'personal-info';
+          break;
+        default:
+          showToast(`Page "${page}" coming soon!`);
+      }
+    }
+
+
+    function editAvatar() {
+      showToast('Avatar editor coming soon!');
+    }
+
+    function editProfile() {
+      showToast('Opening profile editor...');
+    }
+
+    function shareApp() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Recharja',
+          text: 'Check out Recharja - The best way to buy data, airtime & pay bills!',
+          url: 'https://recharja.com'
+        });
+      } else {
+        showToast('Share feature not supported');
+      }
+    }
+
+    async function logout() {
+      if (!confirm('Are you sure you want to logout?')) return;
+      showToast('Logging out...');
+      try {
+        await fetch(`${BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
+      } catch {}
+      setTimeout(() => (window.location.href = 'login'), 800);
+    }
+
+    // Bottom nav interaction
+    const navItems = document.querySelectorAll(".nav-item");
+    navItems.forEach(item => {
+      item.addEventListener("click", function() {
+        navItems.forEach(i => i.classList.remove("active"));
+        this.classList.add("active");
+      });
+    });
+    
+function showReferralPopup(message) {
+  const popup = document.getElementById('referralPopup');
+  if (!popup) return;
+
+  popup.textContent = message;
+  popup.classList.add('show');
+
+  setTimeout(() => {
+    popup.classList.remove('show');
+  }, 4000); // visible for 4 seconds
+}
+
+
+
+// ----------------------------
+// ✅ Settings Modal & Toggles (LocalStorage)
+// ----------------------------
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsOverlay = document.getElementById('settingsOverlay');
+const settingsModal = document.getElementById('settingsModal');
+const closeSettings = document.getElementById('closeSettings');
+
+// Open modal
+settingsBtn.addEventListener('click', () => {
+  settingsOverlay.classList.add('show');
+  setTimeout(() => settingsModal.classList.add('show'), 10);
+});
+
+// Close modal
+function closeSettingsModal() {
+  settingsModal.classList.remove('show');
+  setTimeout(() => settingsOverlay.classList.remove('show'), 300);
+}
+closeSettings.addEventListener('click', closeSettingsModal);
+settingsOverlay.addEventListener('click', closeSettingsModal);
+
+// Prevent modal close when clicking inside
+settingsModal.addEventListener('click', e => e.stopPropagation());
+
+// ----------------------------
+// Toggle Settings
+// ----------------------------
+const toggleAll = document.getElementById('toggleAll');
+const toggleTransaction = document.getElementById('toggleTransaction');
+const togglePromotion = document.getElementById('togglePromotion');
+const toggleSecurity = document.getElementById('toggleSecurity');
+
+// Master toggle
+toggleAll.addEventListener('change', e => {
+  const checked = e.target.checked;
+  [toggleTransaction, togglePromotion, toggleSecurity].forEach(t => t.checked = checked);
+  localStorage.setItem('notif_all', checked);
+  localStorage.setItem('notif_transaction', checked);
+  localStorage.setItem('notif_promotion', checked);
+  localStorage.setItem('notif_security', checked);
+});
+
+// Individual toggles
+[toggleTransaction, togglePromotion, toggleSecurity].forEach(toggle => {
+  toggle.addEventListener('change', e => {
+    toggleAll.checked = toggleTransaction.checked && togglePromotion.checked && toggleSecurity.checked;
+    localStorage.setItem(`notif_${toggle.id.replace('toggle','').toLowerCase()}`, e.target.checked);
+  });
+});
+
+// Other preferences
+document.getElementById('toggleSound').addEventListener('change', e => localStorage.setItem('notif_sound', e.target.checked));
+document.getElementById('toggleVibration').addEventListener('change', e => localStorage.setItem('notif_vibration', e.target.checked));
+document.getElementById('toggleEmail').addEventListener('change', e => localStorage.setItem('notif_email', e.target.checked));
+
+// Load saved settings on page load
+window.addEventListener('load', () => {
+  const loadSetting = (id, defaultValue = true) => {
+    const saved = localStorage.getItem(`notif_${id.replace('toggle','').toLowerCase()}`);
+    document.getElementById(id).checked = saved !== null ? saved === 'true' : defaultValue;
+  };
+  
+  ['toggleAll','toggleTransaction','togglePromotion','toggleSecurity','toggleSound','toggleVibration','toggleEmail'].forEach(id => 
+    loadSetting(id, id==='toggleEmail'?false:true)
+  );
+});
+
+  </script>
+</body>
+</html>

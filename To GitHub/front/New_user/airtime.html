@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buy Airtime</title>
+<link rel="stylesheet" href="css/airtime.css">
+
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-left"><p>Buy Airtime</p></div>
+    <div class="avatar" id="avatar">U</div>
+  </div>
+
+  <div class="networks">
+    <div class="network-btn selected">MTN</div>
+    <div class="network-btn">Airtel</div>
+    <div class="network-btn">Glo</div>
+    <div class="network-btn">9mobile</div>
+  </div>
+
+  <div class="buy-data">
+    📶 Need Data instead? <a id="buyDataLink" class="buy-now">Buy now</a>
+  </div>
+
+  <div class="form-group">
+    <label>Frequently Used</label>
+    <div class="frequent-numbers" id="frequentNumbers"></div>
+  </div>
+
+  <div class="form-group">
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" placeholder="Enter phone number" />
+  </div>
+  <div class="form-group">
+    <label for="amount">Amount (₦)</label>
+    <input type="number" id="amount" placeholder="Enter amount" />
+  </div>
+  <div class="form-group">
+    <label for="payment-method">Payment Method</label>
+    <select id="payment-method">
+      <option value="wallet">Wallet Balance</option>
+      <option value="card">Linked Card</option>
+    </select>
+    <div class="payment-balance" id="paymentBalance"></div>
+  </div>
+
+  <div class="message" id="message"></div>
+  <button class="btn" id="buyBtn">Buy Airtime</button>
+
+  <div class="receipt" id="receipt"></div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <div class="nav-item" data-target="dashboard"><span class="nav-icon">🏠</span>Home</div>
+  <div class="nav-item" data-target="menu"><span class="nav-icon">🧭</span>Menu</div>
+  <div class="nav-item" data-target="profile"><span class="nav-icon">👤</span>Profile</div>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+
+const avatar = document.getElementById('avatar');
+const phoneInput = document.getElementById('phone');
+const amountInput = document.getElementById('amount');
+const paymentSelect = document.getElementById('payment-method');
+const paymentBalance = document.getElementById('paymentBalance');
+const frequentContainer = document.getElementById('frequentNumbers');
+const buyBtn = document.getElementById('buyBtn');
+const messageDiv = document.getElementById('message');
+const receiptDiv = document.getElementById('receipt');
+let walletBalance = 0;
+
+// ✅ Initialization
+async function init() {
+  try {
+    const authRes = await fetch(`${BASE_URL}/api/auth/me`, { credentials: 'include' });
+    const authData = await authRes.json();
+    if (!authData.success) return window.location.href = 'login';
+
+    const user = authData.user;
+    avatar.textContent = user.name.charAt(0).toUpperCase();
+
+    const walletRes = await fetch(`${BASE_URL}/api/wallet`, { credentials: 'include' });
+    const walletData = await walletRes.json();
+    walletBalance = walletData.balance;
+    paymentBalance.textContent = `Wallet Balance: ₦${walletBalance.toLocaleString()}`;
+    paymentBalance.style.display = paymentSelect.value === 'wallet' ? 'block' : 'none';
+
+    await loadFrequentNumbers();
+  } catch (err) {
+    console.error(err);
+    window.location.href = 'login';
+  }
+}
+
+// ✅ Load frequent numbers
+async function loadFrequentNumbers() {
+  try {
+    const res = await fetch(`${BASE_URL}/api/frequent-numbers?type=airtime`, { credentials: 'include' });
+    const data = await res.json();
+    frequentContainer.innerHTML = '';
+    if (data.status === 'success' && data.frequentNumbers.length > 0) {
+      data.frequentNumbers.forEach(n => {
+        const btn = document.createElement('div');
+        btn.classList.add('number-btn');
+        btn.textContent = n.number;
+        btn.addEventListener('click', () => phoneInput.value = n.number);
+        frequentContainer.appendChild(btn);
+      });
+    } else {
+      frequentContainer.innerHTML = '<div>No frequent numbers</div>';
+    }
+  } catch (err) {
+    console.error(err);
+    frequentContainer.innerHTML = '<div>Error loading numbers</div>';
+  }
+}
+
+// Network selection
+document.querySelectorAll('.network-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.network-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  });
+});
+
+// Payment toggle
+paymentSelect.addEventListener('change', () => {
+  paymentBalance.style.display = paymentSelect.value === 'wallet' ? 'block' : 'none';
+});
+
+// Buy Data link
+document.getElementById('buyDataLink').addEventListener('click', () => {
+  window.location.href = 'data';
+});
+
+// ✅ Buy Airtime
+buyBtn.addEventListener('click', async () => {
+  const network = document.querySelector('.network-btn.selected').textContent;
+  const phone = phoneInput.value.trim();
+  const amount = parseFloat(amountInput.value);
+
+  if (!phone || !amount) return showMessage('Enter phone and amount', 'error');
+  if (paymentSelect.value === 'wallet' && amount > walletBalance) return showMessage('Insufficient wallet balance', 'error');
+
+  buyBtn.disabled = true;
+  const originalText = buyBtn.textContent;
+  buyBtn.innerHTML = 'Processing<span class="spinner"></span>';
+  showMessage('', '');
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/airtime/purchase`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ network, phone, amount })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      walletBalance -= amount;
+      paymentBalance.textContent = `Wallet Balance: ₦${walletBalance.toLocaleString()}`;
+      await loadFrequentNumbers();
+
+      // ✅ Redirect to receipt page with transaction ID
+      window.location.href = `receipt.html?id=${data.transaction._id}`;
+    } else {
+      showMessage(data.message || 'Transaction failed', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showMessage('Server error', 'error');
+  } finally {
+    buyBtn.disabled = false;
+    buyBtn.textContent = originalText;
+  }
+});
+
+// ✅ Show messages
+function showMessage(msg, type) {
+  messageDiv.textContent = msg;
+  messageDiv.className = `message ${type}`;
+}
+
+// ✅ Show receipt
+function showReceipt(transaction) {
+  receiptDiv.style.display = 'block';
+  receiptDiv.innerHTML = `
+    <strong>Receipt</strong><br/>
+    Reference: ${transaction.reference}<br/>
+    Phone: ${transaction.phone}<br/>
+    Network: ${transaction.service}<br/>
+    Amount: ₦${transaction.amount}<br/>
+    Status: ${transaction.status}<br/>
+    Date: ${new Date(transaction.createdAt).toLocaleString()}
+  `;
+}
+
+document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.getAttribute('data-target');
+    if (target) window.location.href = target;
+  });
+});
+
+
+// Initialize
+init();
+</script>
+</body>
+</html>

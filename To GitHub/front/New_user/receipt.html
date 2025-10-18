@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recharja Receipt</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Orbitron:wght@700&display=swap');
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: radial-gradient(circle at top left, #09090f, #0e0e16, #101020);
+    color: #fff;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .receipt {
+    width: 95%;
+    max-width: 430px;
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(10px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+
+  .brand { text-align: center; margin-bottom: 25px; }
+  .brand h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #00ffcc, #007bff, #ff0099);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 12px rgba(0,255,200,0.3);
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%,100% {text-shadow: 0 0 8px rgba(0,255,200,0.3);}
+    50% {text-shadow: 0 0 18px rgba(0,255,200,0.6);}
+  }
+
+  .summary { text-align: center; background: rgba(255,255,255,0.08); padding: 12px; border-radius: 12px; margin-bottom: 20px; }
+  .summary h3 { margin:0; font-size:16px; color:#cfd2ff; line-height:1.4; }
+  .highlight { color:#00ff8c; font-weight:700; font-size:15px; margin-top:6px; }
+
+  .details { background: rgba(255,255,255,0.04); border-radius:12px; padding:14px 15px; }
+  .details p { display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding:8px 0; font-size:14px; }
+  .details p:last-child { border-bottom:none; }
+
+  .actions { margin-top:24px; display:flex; justify-content:center; }
+  button {
+    border:none;
+    background:linear-gradient(90deg,#2563eb,#1e3a8a);
+    color:#fff;
+    font-weight:600;
+    border-radius:12px;
+    padding:12px 28px;
+    cursor:pointer;
+    font-size:15px;
+    transition: all 0.3s ease;
+  }
+  button:hover { transform:scale(1.03); box-shadow:0 0 12px #2563eb; }
+
+  .footer { margin-top:25px; text-align:center; font-size:12px; color:#bbb; }
+  .footer strong { font-family:'Orbitron', sans-serif; font-weight:700; background:linear-gradient(90deg,#00ffcc,#007bff,#ff0099); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .footer a { color:#4f9cff; text-decoration:none; }
+
+  /* -------------------------------
+   GLOBAL NATIVE-APP FEEL STYLING
+------------------------------- */
+
+/* Prevent text selection and long-press menus globally */
+body, html, #dashboard {
+  user-select: none;           /* Standard */
+  -webkit-user-select: none;   /* Safari/Chrome */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* IE */
+  -webkit-touch-callout: none; /* Disable long-press menu on iOS */
+  -webkit-user-drag: none;     /* Prevent image dragging */
+}
+
+/* Allow text selection in form fields */
+input, textarea {
+  user-select: text;         
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* Optional: prevent context menu everywhere except inputs/buttons */
+body {
+  -webkit-tap-highlight-color: transparent; /* Remove mobile highlight */
+}
+
+
+
+</style>
+</head>
+<body>
+  <div class="receipt">
+    <div class="brand">
+      <h1>Recharja</h1>
+    </div>
+
+    <div class="summary">
+      <h3>Loading...</h3>
+      <p class="highlight">⏳ Loading</p>
+    </div>
+
+    <div class="details">
+      <p><span>Date:</span><span>—</span></p>
+      <p><span>Number:</span><span>—</span></p>
+      <p><span>Old Balance:</span><span>₦—</span></p>
+      <p><span>Current Balance:</span><span>₦—</span></p>
+      <p><span>Reference:</span><span>—</span></p>
+    </div>
+
+    <div class="actions">
+      <button onclick="window.print()">🧾 Print Receipt</button>
+    </div>
+
+    <div class="footer">
+      <p>Thank you for using <strong>Recharja</strong></p>
+      <p>Need help? <a href="#">Contact Support</a></p>
+    </div>
+  </div>
+
+<script src="js/config.js"></script>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const txId = urlParams.get("id");
+
+async function loadReceipt() {
+  try {
+    // ✅ Check authentication
+    const authRes = await fetch(`${BASE_URL}/api/auth/me`, { credentials: 'include' });
+    const authData = await authRes.json();
+    if (!authData.success) return window.location.href = 'login';
+
+    // ✅ Load transaction
+    const txRes = await fetch(`${BASE_URL}/api/wallet/transactions/${txId}`, { credentials: 'include' });
+    const txData = await txRes.json();
+    if (!txData.success) throw new Error("Transaction not found");
+    const tx = txData.transaction;
+
+    // ✅ Populate summary
+    document.querySelector('.summary h3').textContent = `${tx.description} Purchase To ${tx.phone || '—'}`;
+    document.querySelector('.highlight').textContent =
+      tx.status === 'success' ? '✅ Success' :
+      tx.status === 'failed' ? '❌ Failed' : '⏳ Pending';
+
+    // ✅ Populate details including old and current balance
+    document.querySelector('.details').innerHTML = `
+      <p><span>Date:</span><span>${new Date(tx.createdAt).toLocaleString('en-NG', { weekday:'short', year:'numeric', month:'short', day:'numeric', hour:'numeric', minute:'2-digit', hour12:true })}</span></p>
+      <p><span>Number:</span><span>${tx.phone || '—'}</span></p>
+      <p><span>Old Balance:</span><span>₦${tx.oldBalance?.toLocaleString() || '—'}</span></p>
+      <p><span>Current Balance:</span><span>₦${tx.currentBalance?.toLocaleString() || '—'}</span></p>
+      <p><span>Reference:</span><span>${tx.reference || tx._id}</span></p>
+    `;
+  } catch (err) {
+    console.error(err);
+    alert("Could not load receipt. Redirecting to login.");
+    window.location.href = 'login';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadReceipt);
+</script>
+</body>
+</html>

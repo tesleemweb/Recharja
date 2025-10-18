@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu - Recharja</title>
+<link rel="stylesheet" href="css/menu.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-title">Menu</div>
+      <div class="header-avatar">U</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Search Bar -->
+    <div class="search-container">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" placeholder="Search for services..." id="searchInput">
+      </div>
+    </div>
+
+<!-- Promo Banner (empty, will be filled by JS) -->
+<div class="promo-banner" style="display:none;">
+  <div class="promo-icon">🎁</div>
+  <div class="promo-content">
+    <div class="promo-title"></div>
+    <div class="promo-text"></div>
+  </div>
+</div>
+
+    <!-- Popular Services -->
+    <div class="menu-section">
+      <div class="section-header">
+        <div class="section-title">Popular Services</div>
+        <span class="view-all" onclick="navigate('popular')">View All →</span>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-item" onclick="navigate('data')">
+          <span class="badge-hot">Hot</span>
+          <span class="menu-icon">📶</span>
+          <div class="menu-label">Buy Data</div>
+        </div>
+        <div class="menu-item" onclick="navigate('airtime')">
+          <span class="menu-icon">📱</span>
+          <div class="menu-label">Airtime</div>
+        </div>
+        <div class="menu-item" onclick="navigate('cable')">
+          <span class="menu-icon">📺</span>
+          <div class="menu-label">Cable TV</div>
+        </div>
+        <div class="menu-item" onclick="navigate('electricity')">
+          <span class="menu-icon">💡</span>
+          <div class="menu-label">Electricity</div>
+        </div>
+        <div class="menu-item" onclick="navigate('education')">
+          <span class="menu-icon">📚</span>
+          <div class="menu-label">Education</div>
+        </div>
+        <div class="menu-item" onclick="navigate('betting')">
+          <span class="badge-new">New</span>
+          <span class="menu-icon">🎰</span>
+          <div class="menu-label">Betting</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financial Services -->
+    <div class="menu-section">
+      <div class="section-header">
+        <div class="section-title">Financial Services</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card" onclick="navigate('transfer')">
+          <span class="feature-icon">💸</span>
+          <div>
+            <div class="feature-title">Transfer</div>
+            <div class="feature-desc">Send money instantly</div>
+          </div>
+        </div>
+        <div class="feature-card" onclick="navigate('withdraw')">
+          <span class="feature-icon">🏦</span>
+          <div>
+            <div class="feature-title">Withdraw</div>
+            <div class="feature-desc">Cash out to bank</div>
+          </div>
+        </div>
+<div class="feature-card" id="fundWalletCard">
+  <span class="feature-icon">💰</span>
+  <div>
+    <div class="feature-title">Fund Wallet</div>
+    <div class="feature-desc">Top up your balance</div>
+  </div>
+</div>
+
+        <div class="feature-card" onclick="navigate('cards')">
+          <span class="feature-icon">💳</span>
+          <div>
+            <div class="feature-title">My Cards</div>
+            <div class="feature-desc">Manage payment cards</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Betting Platforms -->
+    <div class="menu-section">
+      <div class="section-header">
+        <div class="section-title">Betting Platforms</div>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-item" onclick="navigate('bet9ja')">
+          <span class="badge-new">New</span>
+          <span class="menu-icon">🎲</span>
+          <div class="menu-label">Bet9ja</div>
+        </div>
+        <div class="menu-item" onclick="navigate('sportybet')">
+          <span class="menu-icon">⚽</span>
+          <div class="menu-label">SportyBet</div>
+        </div>
+        <div class="menu-item" onclick="navigate('1xbet')">
+          <span class="menu-icon">🏀</span>
+          <div class="menu-label">1xBet</div>
+        </div>
+        <div class="menu-item" onclick="navigate('nairabet')">
+          <span class="menu-icon">🎯</span>
+          <div class="menu-label">NairaBet</div>
+        </div>
+        <div class="menu-item" onclick="navigate('betking')">
+          <span class="menu-icon">👑</span>
+          <div class="menu-label">BetKing</div>
+        </div>
+        <div class="menu-item" onclick="navigate('merrybet')">
+          <span class="menu-icon">🎰</span>
+          <div class="menu-label">MerryBet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Utilities & More -->
+    <div class="menu-section">
+      <div class="section-header">
+        <div class="section-title">Utilities & More</div>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-item" onclick="navigate('internet')">
+          <span class="menu-icon">🌐</span>
+          <div class="menu-label">Internet</div>
+        </div>
+        <div class="menu-item" onclick="navigate('insurance')">
+          <span class="menu-icon">🛡️</span>
+          <div class="menu-label">Insurance</div>
+        </div>
+        <div class="menu-item" onclick="navigate('airtime2cash')">
+          <span class="menu-icon">💵</span>
+          <div class="menu-label">Airtime to Cash</div>
+        </div>
+        <div class="menu-item" onclick="navigate('recharge-card')">
+          <span class="menu-icon">🎫</span>
+          <div class="menu-label">Recharge Card</div>
+        </div>
+        <div class="menu-item" onclick="navigate('gift-cards')">
+          <span class="menu-icon">🎁</span>
+          <div class="menu-label">Gift Cards</div>
+        </div>
+        <div class="menu-item" onclick="navigate('bulk-sms')">
+          <span class="menu-icon">📧</span>
+          <div class="menu-label">Bulk SMS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Management -->
+    <div class="menu-section">
+      <div class="section-header">
+        <div class="section-title">Account & Settings</div>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-item" onclick="navigate('transactions')">
+          <span class="menu-icon">💳</span>
+          <div class="menu-label">Transactions</div>
+        </div>
+        <div class="menu-item" onclick="navigate('referral')">
+          <span class="badge-hot">Hot</span>
+          <span class="menu-icon">👥</span>
+          <div class="menu-label">Refer & Earn</div>
+        </div>
+        <div class="menu-item" onclick="navigate('2fa')">
+          <span class="menu-icon">🔐</span>
+          <div class="menu-label">Security</div>
+        </div>
+        <div class="menu-item" onclick="navigate('notifications')">
+          <span class="menu-icon">🔔</span>
+          <div class="menu-label">Notifications</div>
+        </div>
+        <div class="menu-item" onclick="navigate('rate')">
+        <span class="menu-icon">⭐</span>
+        <div class="menu-label">Rate App</div>
+      </div>
+        <div class="menu-item" onclick="navigate('support')">
+          <span class="menu-icon">💬</span>
+          <div class="menu-label">Support</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="navigate('home')">
+      <span class="nav-icon">🏠</span>Home
+    </div>
+    <div class="nav-item active">
+      <span class="nav-icon">🧭</span>Menu
+    </div>
+    <div class="nav-item" onclick="navigate('profile')">
+      <span class="nav-icon">👤</span>Profile
+    </div>
+  </div>
+
+<script src="js/config.js"></script>
+<script>
+// -------------------------
+// Check if user is logged in
+// -------------------------
+const checkAuth = async () => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/me`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Not authenticated');
+    const me = await res.json();
+
+    // Update avatar
+    const avatarEl = document.querySelector('.header-avatar');
+    if (avatarEl) avatarEl.textContent = (me.name || 'U').charAt(0).toUpperCase();
+  } catch (err) {
+    console.warn('⛔ Not logged in:', err.message);
+    window.location.href = 'login';
+  }
+};
+
+// -------------------------
+// Promo banner
+// -------------------------
+const promoPageMap = {
+  all: 'dashboard',
+  airtime: 'airtime',
+  data: 'data'
+};
+
+const loadPromo = async () => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/promo`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch promo');
+
+    const data = await res.json();
+    if (!data.success || !data.promo) return;
+
+    const promoEl = document.querySelector('.promo-banner');
+    if (!promoEl) return;
+
+    promoEl.querySelector('.promo-title').textContent = data.promo.title;
+    promoEl.querySelector('.promo-text').textContent = data.promo.text;
+
+    const link = promoPageMap[data.promo.type] || 'dashboard';
+    promoEl.onclick = () => window.location.href = link;
+
+    promoEl.style.display = 'flex';
+  } catch (err) {
+    console.error('⚠️ Promo load error:', err.message);
+  }
+};
+
+// -------------------------
+// Navigation
+// -------------------------
+const activePages = {
+  'airtime': 'airtime',
+  'data': 'data',
+  'transactions': 'transactions',
+  'notifications': 'notifications',
+  'support': 'https://wa.me/qr/4QLKTIOQTOIFM1',
+  'home': 'dashboard',
+  'profile': 'profile',
+  'menu': 'menu'
+};
+
+function navigate(page) {
+  if (activePages[page]) {
+    window.location.href = activePages[page];
+  } else {
+    alert('Coming Soon 🚧');
+  }
+}
+
+// -------------------------
+// Fund Wallet
+// -------------------------
+const fundWallet = async () => {
+  const raw = prompt('Enter amount to fund (₦):');
+  const amt = parseFloat(raw);
+  if (!amt || amt < 100) return alert('⚠️ Minimum funding is ₦100');
+
+  try {
+    const init = await fetch(`${BASE_URL}/api/wallet/fund`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ amount: amt })
+    }).then(res => {
+      if (!res.ok) throw new Error('Payment initiation failed');
+      return res.json();
+    });
+
+    if (!init.authorization_url) throw new Error(init.msg || 'Missing payment URL');
+    window.location.href = init.authorization_url;
+  } catch (err) {
+    console.error('💳 Funding error:', err.message);
+    alert('❌ Payment initiation failed.');
+  }
+};
+
+// -------------------------
+// Search
+// -------------------------
+const setupSearch = () => {
+  const input = document.getElementById('searchInput');
+  if (!input) return;
+
+  input.addEventListener('input', () => {
+    const query = input.value.toLowerCase().trim();
+    const menuItems = document.querySelectorAll('.menu-item');
+
+    menuItems.forEach(item => {
+      const labelEl = item.querySelector('.menu-label');
+      const label = labelEl?.textContent.toLowerCase() || '';
+      item.style.display = label.includes(query) ? 'flex' : 'none';
+    });
+  });
+};
+
+// -------------------------
+// Bottom nav activation
+// -------------------------
+const setupBottomNav = () => {
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      const t = item.dataset.target;
+      if (t) navigate(t);
+    });
+  });
+};
+
+// -------------------------
+// Combine all DOMContentLoaded tasks
+// -------------------------
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkAuth();
+  loadPromo();
+  setupSearch();
+  setupBottomNav();
+
+  const fundCard = document.getElementById('fundWalletCard');
+  if (fundCard) fundCard.addEventListener('click', fundWallet);
+});
+</script>
+
+</body>
+</html>

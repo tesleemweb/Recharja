@@ -1,0 +1,332 @@
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f172a;
+    color: #f8fafc;
+  }
+  .container {
+    padding: 20px;
+    padding-bottom: 90px;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+  .header-left p {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+
+  /* Quick Networks */
+  .networks {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .network-btn {
+    flex: 1;
+    margin-right: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #1e293b;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.25s;
+  }
+  .network-btn:last-child { margin-right: 0; }
+  .network-btn:hover { background: #334155; }
+  .network-btn.selected { background: #2563eb; color: #fff; }
+
+  /* Quick Buy Airtime Link */
+  .buy-data {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .buy-data .buy-now {
+    background: #22c55e;
+    color: white;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.25s;
+    font-size: 13px;
+  }
+  .buy-data .buy-now:hover {
+    background: #16a34a;
+  }
+
+  /* Frequently Used Numbers */
+  .frequent-numbers {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .number-btn {
+    background: #1e293b;
+    padding: 10px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.25s;
+    font-size: 14px;
+  }
+  .number-btn:hover { background: #334155; }
+
+  /* Form */
+  .form-group {
+    margin-bottom: 20px;
+    position: relative;
+  }
+  label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  input, select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: #1e293b;
+    color: #f8fafc;
+    font-size: 16px;
+  }
+  input:focus, select:focus {
+    outline: none;
+    background: #334155;
+  }
+
+/* Category Buttons */
+.category-btns {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.category-btn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #1e293b;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, border 0.15s;
+  color: #cbd5e1;
+  font-weight: 500;
+  border: 1.5px solid transparent; /* subtle border space for selected state */
+}
+.category-btn.selected {
+  background: #1e293b; /* same as default */
+  color: #fff;
+  border: 1.5px solid #2563eb; /* subtle blue outline */
+  box-shadow: none; /* remove shadow */
+}
+.category-btn:hover:not(.selected) {
+  background: #2c3a52; /* soft hover effect */
+}
+  /* Plan List */
+  .plan-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .plan-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  .plan-list::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+  .plan-list::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 2px;
+  }
+  .plan-item {
+    padding: 10px 12px;
+    background: #1e293b;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.25s, transform 0.15s;
+    font-size: 14px;
+  }
+  .plan-item span:last-child {
+    font-size: 13px;
+    color: #cbd5e1;
+  }
+  .plan-item.selected {
+    background: #1e293b;
+    cursor: default;
+  }
+  .plan-item:hover:not(.selected) {
+    background: #334155;
+    transform: translateX(2px);
+  }
+
+  /* Change Plan Button */
+  .change-plan-btn {
+    display: none;
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: #475569;
+    color: #cbd5e1;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.25s;
+  }
+  .change-plan-btn:hover {
+    background: #334155;
+  }
+
+  /* Wallet balance inside payment */
+.payment-balance {
+  display: block; /* ✅ make it visible */
+  font-size: 14px;
+  color: #22c55e;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+
+  /* Button */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    background: #2563eb;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.15s;
+  }
+  .btn:hover { 
+    background: #1d4ed8; 
+    transform: translateY(-2px);
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #0f172a;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #1e293b;
+  }
+  .nav-item { text-align: center; font-size: 12px; color: #94a3b8; }
+  .nav-item.active { color: #2563eb; }
+  .nav-icon { font-size: 20px; margin-bottom: 4px; display: block; }
+  
+
+    /* Bottom Navigation */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0f172a;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #1e293b;
+    z-index: 100;
+  }
+
+  .nav-item {
+    text-align: center;
+    font-size: 12px;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 8px 20px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .nav-item.active {
+    color: #2563eb;
+    background: rgba(37, 99, 235, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 3px;
+    background: #2563eb;
+    border-radius: 0 0 3px 3px;
+  }
+
+  .nav-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .nav-item.active .nav-icon {
+    transform: scale(1.1);
+  }
+
+
+  /* -------------------------------
+   GLOBAL NATIVE-APP FEEL STYLING
+------------------------------- */
+
+/* Prevent text selection and long-press menus globally */
+body, html, #dashboard {
+  user-select: none;           /* Standard */
+  -webkit-user-select: none;   /* Safari/Chrome */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* IE */
+  -webkit-touch-callout: none; /* Disable long-press menu on iOS */
+  -webkit-user-drag: none;     /* Prevent image dragging */
+}
+
+/* Allow text selection in form fields */
+input, textarea {
+  user-select: text;         
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* Optional: prevent context menu everywhere except inputs/buttons */
+body {
+  -webkit-tap-highlight-color: transparent; /* Remove mobile highlight */
+}

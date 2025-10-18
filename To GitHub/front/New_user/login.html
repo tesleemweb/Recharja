@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recharja Login</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: radial-gradient(circle at 20% 30%, #1e293b, #0f172a 70%);
+  color: #f8fafc;
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative; /* important for the .bg-animation positioning */
+}
+
+
+  @keyframes floatGlow {
+    0%,100% { transform: translateY(0px); opacity: 0.6; }
+    50% { transform: translateY(-15px); opacity: 1; }
+  }
+
+  .glow {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37,99,235,0.35), transparent 70%);
+    animation: floatGlow 8s ease-in-out infinite;
+    filter: blur(40px);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .glow.one { top: 15%; left: 10%; }
+  .glow.two { bottom: 15%; right: 10%; background: radial-gradient(circle, rgba(34,197,94,0.3), transparent 70%); animation-delay: -4s; }
+
+  .login-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 400px;
+    background: rgba(30,41,59,0.85);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    padding: 40px 30px;
+    text-align: center;
+    animation: fadeIn 1s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .app-logo {
+    width: 60px; 
+    height: 60px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, #2563eb, #22c55e);
+    border-radius: 16px;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    font-weight: 800; 
+    font-size: 22px; 
+    color: white;
+    box-shadow: 0 0 12px rgba(37,99,235,0.4);
+    animation: logoFloat 3s ease-in-out infinite;
+  }
+
+  @keyframes logoFloat {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  h1 { 
+    margin: 10px 0 6px; 
+    font-size: 22px; 
+    font-weight: 700; 
+  }
+  
+  p { 
+    margin: 0 0 30px; 
+    font-size: 14px; 
+    color: #94a3b8; 
+  }
+
+  .input-group { 
+    text-align: left; 
+    margin-bottom: 20px; 
+  }
+  
+  .input-group label {
+    display: block; 
+    font-size: 13px; 
+    color: #94a3b8; 
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  
+  .input-group input {
+    width: 100%; 
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.6);
+    border-radius: 10px;
+    color: #fff; 
+    font-size: 14px;
+    outline: none; 
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-family: inherit;
+  }
+  
+  .input-group input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 8px rgba(37,99,235,0.4);
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #2563eb, #22c55e);
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-family: inherit;
+  }
+  
+  .btn:hover:not(.loading) { 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 18px rgba(37,99,235,0.3); 
+  }
+  
+  .btn.loading { 
+    background: #1e293b; 
+    color: transparent; 
+    position: relative; 
+    cursor: not-allowed; 
+    pointer-events: none;
+  }
+  
+  .btn.loading::after {
+    content: ''; 
+    position: absolute; 
+    left: 50%; 
+    top: 50%;
+    width: 18px; 
+    height: 18px; 
+    border: 3px solid #2563eb;
+    border-top: 3px solid transparent; 
+    border-radius: 50%;
+    animation: spin 1s linear infinite; 
+    transform: translate(-50%, -50%);
+  }
+
+  @keyframes spin { 
+    to { transform: translate(-50%, -50%) rotate(360deg); } 
+  }
+
+  .btn-secondary {
+    width: 100%;
+    margin-top: 10px;
+    background: rgba(37,99,235,0.15);
+    color: #94a3b8;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 13px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+  }
+  
+  .btn-secondary:hover { 
+    background: rgba(37,99,235,0.3); 
+    color: #fff; 
+  }
+
+  .hidden { 
+    display: none !important; 
+  }
+  
+  .otp-container {
+    display: flex; 
+    justify-content: center; 
+    gap: 8px; 
+    margin: 20px 0;
+  }
+  
+  .otp-input {
+    width: 45px; 
+    height: 50px;
+    font-size: 18px; 
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    background: rgba(15,23,42,0.6);
+    color: #fff;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-family: inherit;
+    font-weight: 600;
+  }
+
+  .otp-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 8px rgba(37,99,235,0.4);
+  }
+
+  .message { 
+    font-size: 13px; 
+    margin-top: 12px; 
+    min-height: 18px; 
+    padding: 8px;
+    border-radius: 6px;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .success-msg { 
+    color: #22c55e; 
+    background: rgba(34, 197, 94, 0.1);
+  }
+  
+  .error-msg { 
+    color: #f87171; 
+    background: rgba(248, 113, 113, 0.1);
+  }
+
+  .extra-links { 
+    margin-top: 20px; 
+    font-size: 13px; 
+  }
+  
+  .extra-links p {
+    margin: 8px 0;
+  }
+  
+  .extra-links a {
+    color: #22c55e; 
+    text-decoration: none; 
+    transition: color 0.3s;
+    font-weight: 500;
+  }
+  
+  .extra-links a:hover { 
+    color: #2563eb; 
+  }
+
+  @media (max-width: 480px) {
+    .login-container {
+      padding: 30px 20px;
+    }
+    
+    .otp-input {
+      width: 40px;
+      height: 45px;
+      font-size: 16px;
+    }
+    
+    h1 {
+      font-size: 20px;
+    }
+  }
+
+
+/* === Animated Background === */
+
+.bg-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* ensures it's behind everything */
+  overflow: hidden;
+}
+
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: float 30s infinite ease-in-out;
+}
+
+/* Circle 1 */
+.bg-circle:nth-child(1) {
+  width: 300px;
+  height: 300px;
+  background: #2563eb;
+  top: -100px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+/* Circle 2 */
+.bg-circle:nth-child(2) {
+  width: 200px;
+  height: 200px;
+  background: #22c55e;
+  bottom: -50px;
+  right: -50px;
+  animation-delay: 5s;
+}
+
+/* Circle 3 */
+.bg-circle:nth-child(3) {
+  width: 250px;
+  height: 250px;
+  background: #2563eb;
+  top: 50%;
+  right: -100px;
+  animation-delay: 10s;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(50px, -50px) scale(1.1); }
+  66% { transform: translate(-30px, 30px) scale(0.9); }
+}
+
+
+.login-container {
+  position: relative;
+  z-index: 2;
+}
+.bg-animation {
+  z-index: 0;
+}
+
+
+
+.app-logo {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 16px;
+  background: none; /* remove gradient background */
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: logoFloat 3s ease-in-out infinite;
+  box-shadow: none; /* optional: remove colored shadow */
+}
+
+.app-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+
+
+/* -------------------------------
+   GLOBAL NATIVE-APP FEEL STYLING
+------------------------------- */
+
+/* Prevent text selection and long-press menus globally */
+body, html, #dashboard {
+  user-select: none;           /* Standard */
+  -webkit-user-select: none;   /* Safari/Chrome */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* IE */
+  -webkit-touch-callout: none; /* Disable long-press menu on iOS */
+  -webkit-user-drag: none;     /* Prevent image dragging */
+}
+
+/* Allow text selection in form fields */
+input, textarea {
+  user-select: text;         
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* Optional: prevent context menu everywhere except inputs/buttons */
+body {
+  -webkit-tap-highlight-color: transparent; /* Remove mobile highlight */
+}
+
+
+</style>
+</head>
+<body>
+<!-- Animated background -->
+<div class="bg-animation">
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+</div>
+
+<div class="login-container" id="mainContainer">
+  <div class="app-logo">
+    <img src="assets/logo.png" alt="Recharja Logo">
+  </div>
+  <h1 id="formTitle">Welcome Back 👋</h1>
+  <p id="formSubtitle">Log in to access your Recharja dashboard</p>
+
+  <!-- LOGIN FORM -->
+  <form id="loginForm">
+    <div class="input-group">
+      <label for="emailOrUsername">Email or Username</label>
+      <input type="text" id="emailOrUsername" placeholder="example@gmail.com" required autocomplete="username">
+    </div>
+    <div class="input-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+    </div>
+    <button type="submit" class="btn" id="loginBtn">Login</button>
+  </form>
+
+  <!-- FORGOT PASSWORD FORM -->
+  <div id="forgotContainer" class="hidden">
+    <div class="input-group" id="forgotEmailGroup">
+      <label for="forgotEmail">Email Address</label>
+      <input type="email" id="forgotEmail" placeholder="example@gmail.com" required autocomplete="email">
+    </div>
+
+    <div id="otpGroup" class="hidden">
+      <label>Enter OTP</label>
+      <div class="otp-container">
+        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+      </div>
+    </div>
+
+    <div id="newPassGroup" class="hidden">
+      <div class="input-group">
+        <label for="newPassword">New Password</label>
+        <input type="password" id="newPassword" placeholder="Min. 6 characters" autocomplete="new-password">
+      </div>
+      <div class="input-group">
+        <label for="confirmNewPassword">Confirm Password</label>
+        <input type="password" id="confirmNewPassword" placeholder="Re-enter password" autocomplete="new-password">
+      </div>
+    </div>
+
+    <button type="button" class="btn" id="forgotNextBtn">Send OTP</button>
+    <button type="button" class="btn-secondary" id="forgotBackBtn">← Back</button>
+    <div id="forgotMsg" class="message"></div>
+  </div>
+
+  <div class="extra-links">
+    <p><a href="#" id="forgotLink">Forgot Password?</a></p>
+    <p>Don't have an account? <a href="sign-up">Sign Up</a></p>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+'use strict';
+
+// ===============================
+// INITIAL AUTH CHECK
+// ===============================
+(async () => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/me`, { 
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      window.location.href = 'dashboard';
+    }
+  } catch (err) {
+    console.warn('Auth check failed:', err);
+  }
+})();
+
+// ===============================
+// DOM ELEMENT REFERENCES
+// ===============================
+const loginForm = document.getElementById("loginForm");
+const loginBtn = document.getElementById("loginBtn");
+const forgotContainer = document.getElementById("forgotContainer");
+const forgotLink = document.getElementById("forgotLink");
+const formTitle = document.getElementById("formTitle");
+const formSubtitle = document.getElementById("formSubtitle");
+const forgotNextBtn = document.getElementById("forgotNextBtn");
+const forgotEmailGroup = document.getElementById("forgotEmailGroup");
+const otpGroup = document.getElementById("otpGroup");
+const newPassGroup = document.getElementById("newPassGroup");
+const forgotMsg = document.getElementById("forgotMsg");
+const forgotBackBtn = document.getElementById("forgotBackBtn");
+
+// ===============================
+// STATE MANAGEMENT
+// ===============================
+let step = 1;
+let userEmail = "";
+let resetToken = "";
+
+// ===============================
+// UTILITY FUNCTIONS
+// ===============================
+function showMessage(msg, type) {
+  const existingMsg = document.querySelector('.message:not(#forgotMsg)');
+  if (existingMsg) existingMsg.remove();
+  
+  const el = document.createElement("div");
+  el.className = `message ${type === "error" ? "error-msg" : "success-msg"}`;
+  el.textContent = msg;
+  document.querySelector(".extra-links").before(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+function setButtonLoading(button, isLoading) {
+  if (isLoading) {
+    button.classList.add("loading");
+    button.disabled = true;
+  } else {
+    button.classList.remove("loading");
+    button.disabled = false;
+  }
+}
+
+function resetForgotPasswordFlow() {
+  step = 1;
+  userEmail = "";
+  resetToken = "";
+  forgotEmailGroup.classList.remove("hidden");
+  otpGroup.classList.add("hidden");
+  newPassGroup.classList.add("hidden");
+  forgotNextBtn.classList.remove("hidden");
+  forgotNextBtn.textContent = "Send OTP";
+  forgotMsg.textContent = "";
+  document.getElementById("forgotEmail").value = "";
+  document.querySelectorAll(".otp-input").forEach(input => input.value = "");
+  document.getElementById("newPassword").value = "";
+  document.getElementById("confirmNewPassword").value = "";
+}
+
+// ===============================
+// LOGIN LOGIC
+// ===============================
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  
+  const emailOrUsername = document.getElementById("emailOrUsername").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!emailOrUsername || !password) {
+    return showMessage("Please fill in all fields.", "error");
+  }
+
+  setButtonLoading(loginBtn, true);
+  
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({ emailOrUsername, password }),
+    });
+    
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      loginBtn.textContent = "Redirecting...";
+      
+      // Store user data in memory/session
+      try {
+        sessionStorage.setItem("user", JSON.stringify(data.user || {}));
+      } catch (e) {
+        console.warn('SessionStorage unavailable:', e);
+      }
+      
+      setTimeout(() => {
+        window.location.href = "dashboard";
+      }, 800);
+    } else {
+      showMessage(data.msg || "Invalid credentials.", "error");
+      setButtonLoading(loginBtn, false);
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    showMessage("Network error. Please try again.", "error");
+    setButtonLoading(loginBtn, false);
+  }
+});
+
+// ===============================
+// FORGOT PASSWORD FLOW NAVIGATION
+// ===============================
+forgotLink.addEventListener('click', (e) => {
+  e.preventDefault();
+  loginForm.classList.add("hidden");
+  forgotContainer.classList.remove("hidden");
+  formTitle.textContent = "Reset Password";
+  formSubtitle.textContent = "Follow the steps to recover your account";
+  forgotLink.parentElement.style.display = "none";
+  resetForgotPasswordFlow();
+});
+
+forgotBackBtn.addEventListener('click', () => {
+  forgotContainer.classList.add("hidden");
+  loginForm.classList.remove("hidden");
+  formTitle.textContent = "Welcome Back 👋";
+  formSubtitle.textContent = "Log in to access your Recharja dashboard";
+  forgotLink.parentElement.style.display = "block";
+  resetForgotPasswordFlow();
+});
+
+// ===============================
+// FORGOT PASSWORD LOGIC
+// ===============================
+forgotNextBtn.addEventListener('click', async () => {
+  forgotMsg.textContent = "";
+
+  if (step === 1) {
+    // Step 1: Request OTP
+    userEmail = document.getElementById("forgotEmail").value.trim();
+    if (!userEmail) {
+      forgotMsg.textContent = "Please enter your email.";
+      forgotMsg.className = "message error-msg";
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userEmail)) {
+      forgotMsg.textContent = "Please enter a valid email address.";
+      forgotMsg.className = "message error-msg";
+      return;
+    }
+
+    setButtonLoading(forgotNextBtn, true);
+    
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/password-reset/request`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ email: userEmail }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        forgotEmailGroup.classList.add("hidden");
+        otpGroup.classList.remove("hidden");
+        forgotNextBtn.textContent = "Verify OTP";
+        forgotMsg.textContent = "✅ OTP sent to your email.";
+        forgotMsg.className = "message success-msg";
+        step = 2;
+        
+        // Focus first OTP input
+        setTimeout(() => {
+          document.querySelector(".otp-input").focus();
+        }, 100);
+      } else {
+        forgotMsg.textContent = data.msg || "Failed to send OTP.";
+        forgotMsg.className = "message error-msg";
+      }
+    } catch (err) {
+      console.error('OTP request error:', err);
+      forgotMsg.textContent = "Network error. Try again.";
+      forgotMsg.className = "message error-msg";
+    } finally {
+      setButtonLoading(forgotNextBtn, false);
+    }
+
+  } else if (step === 2) {
+    // Step 2: Verify OTP
+    const otpInputs = document.querySelectorAll(".otp-input");
+    const otp = Array.from(otpInputs).map(i => i.value).join("").trim();
+    
+    if (otp.length !== 6) {
+      forgotMsg.textContent = "Please enter the complete 6-digit OTP.";
+      forgotMsg.className = "message error-msg";
+      return;
+    }
+
+    setButtonLoading(forgotNextBtn, true);
+    
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/password-reset/verify`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ email: userEmail, otp }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        resetToken = data.token;
+        otpGroup.classList.add("hidden");
+        newPassGroup.classList.remove("hidden");
+        forgotNextBtn.textContent = "Reset Password";
+        forgotMsg.textContent = "✅ OTP verified. You can now set a new password.";
+        forgotMsg.className = "message success-msg";
+        step = 3;
+        
+        // Focus new password input
+        setTimeout(() => {
+          document.getElementById("newPassword").focus();
+        }, 100);
+      } else {
+        forgotMsg.textContent = data.msg || "Invalid or expired OTP.";
+        forgotMsg.className = "message error-msg";
+      }
+    } catch (err) {
+      console.error('OTP verification error:', err);
+      forgotMsg.textContent = "Network error. Try again.";
+      forgotMsg.className = "message error-msg";
+    } finally {
+      setButtonLoading(forgotNextBtn, false);
+    }
+
+  } else if (step === 3) {
+    // Step 3: Reset password
+    const newPassword = document.getElementById("newPassword").value;
+    const confirmPassword = document.getElementById("confirmNewPassword").value;
+
+    if (!newPassword || !confirmPassword) {
+      forgotMsg.textContent = "Please fill all password fields.";
+      forgotMsg.className = "message error-msg";
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      forgotMsg.textContent = "Password must be at least 6 characters.";
+      forgotMsg.className = "message error-msg";
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      forgotMsg.textContent = "Passwords do not match.";
+      forgotMsg.className = "message error-msg";
+      return;
+    }
+
+    setButtonLoading(forgotNextBtn, true);
+    
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/password-reset/reset`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ token: resetToken, newPassword }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        forgotNextBtn.classList.add("hidden");
+        forgotMsg.innerHTML = '<span class="success-msg">✅ Password reset successful!<br>You can now log in.</span>';
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        forgotMsg.textContent = data.msg || "Failed to reset password.";
+        forgotMsg.className = "message error-msg";
+        setButtonLoading(forgotNextBtn, false);
+      }
+    } catch (err) {
+      console.error('Password reset error:', err);
+      forgotMsg.textContent = "Network error. Try again.";
+      forgotMsg.className = "message error-msg";
+      setButtonLoading(forgotNextBtn, false);
+    }
+  }
+});
+
+// ===============================
+// OTP INPUT AUTO-FOCUS & VALIDATION
+// ===============================
+document.querySelectorAll(".otp-input").forEach((input, index, arr) => {
+  // Only allow numbers
+  input.addEventListener("input", (e) => {
+    const value = e.target.value;
+    
+    // Remove non-numeric characters
+    if (!/^\d*$/.test(value)) {
+      e.target.value = value.replace(/\D/g, '');
+      return;
+    }
+    
+    // Auto-focus next input
+    if (value && index < arr.length - 1) {
+      arr[index + 1].focus();
+    }
+  });
+  
+  // Handle backspace
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace" && !e.target.value && index > 0) {
+      arr[index - 1].focus();
+    }
+  });
+  
+  // Handle paste
+  input.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    
+    pastedData.split('').forEach((char, i) => {
+      if (arr[i]) {
+        arr[i].value = char;
+      }
+    });
+    
+    // Focus the next empty input or the last one
+    const nextEmptyIndex = pastedData.length < arr.length ? pastedData.length : arr.length - 1;
+    arr[nextEmptyIndex].focus();
+  });
+});
+
+</script>
+
+</body>
+</html>

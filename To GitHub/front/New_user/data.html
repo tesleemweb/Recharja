@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buy Data</title>
+<link rel="stylesheet" href="css/data.css">
+<style>
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-left: 6px;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .receipt {
+    background: #0f172a;
+    color: #f8fafc;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-left"><p>Buy Data</p></div>
+    <div class="avatar" id="avatar">U</div>
+  </div>
+
+  <div class="networks">
+    <div class="network-btn selected" data-network="mtn">MTN</div>
+    <div class="network-btn" data-network="airtel">Airtel</div>
+    <div class="network-btn" data-network="glo">Glo</div>
+    <div class="network-btn" data-network="9mobile">9mobile</div>
+  </div>
+
+  <div class="buy-data">
+    📞 Need Airtime instead? <a id="buyAirtimeLink" class="buy-now">Buy now</a>
+  </div>
+
+  <div class="form-group">
+    <label>Frequently Used</label>
+    <div class="frequent-numbers" id="frequentNumbers"></div>
+  </div>
+
+  <div class="form-group">
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" placeholder="Enter phone number" />
+  </div>
+
+  <div class="form-group">
+    <label>Data Category</label>
+    <div class="category-btns">
+      <div class="category-btn selected" data-category="night">Night</div>
+      <div class="category-btn" data-category="weekend">Weekend</div>
+      <div class="category-btn" data-category="direct">Direct</div>
+      <div class="category-btn" data-category="sme">SME</div>
+      <div class="category-btn" data-category="others">Other Available Plans</div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label id="planLabel">Available Plans</label>
+    <div class="plan-list" id="planList"></div>
+    <button id="changePlanBtn" class="change-plan-btn">Change Plan</button>
+  </div>
+
+  <div class="form-group">
+    <label for="payment-method">Payment Method</label>
+    <select id="payment-method">
+      <option value="wallet">Wallet Balance</option>
+      <option value="card">Linked Card</option>
+    </select>
+    <div class="payment-balance" id="paymentBalance">Wallet Balance: ₦0</div>
+  </div>
+
+  <button id="buyBtn" class="btn">Buy Data</button>
+
+  <div id="receiptContainer"></div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <div class="nav-item" data-target="dashboard"><span class="nav-icon">🏠</span>Home</div>
+  <div class="nav-item" data-target="menu"><span class="nav-icon">🧭</span>Menu</div>
+  <div class="nav-item" data-target="profile"><span class="nav-icon">👤</span>Profile</div>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+
+const avatar = document.getElementById('avatar');
+const frequentNumbers = document.getElementById('frequentNumbers');
+const phoneInput = document.getElementById('phone');
+const paymentSelect = document.getElementById('payment-method');
+const paymentBalance = document.getElementById('paymentBalance');
+const planList = document.getElementById('planList');
+const changePlanBtn = document.getElementById('changePlanBtn');
+const planLabel = document.getElementById('planLabel');
+const buyBtn = document.getElementById('buyBtn');
+const receiptContainer = document.getElementById('receiptContainer');
+
+let selectedNetwork = 'mtn';
+let selectedCategory = 'night';
+let selectedPlan = null;
+let plansByCategory = {};
+let walletBalance = 0;
+
+// 1️⃣ AUTH CHECK
+async function checkAuth() {
+  const res = await fetch(`${BASE_URL}/api/auth/me`, { credentials: 'include' });
+  if (!res.ok) return window.location.href = 'login';
+  const data = await res.json();
+  if (!data.success) return window.location.href = 'login';
+  avatar.textContent = data.user.name[0].toUpperCase();
+}
+
+// 2️⃣ LOAD WALLET (static label + dynamic update)
+async function loadWallet() {
+  try {
+    // Start dynamic processing — show loading text beside the static label
+    paymentBalance.innerHTML = `Wallet Balance: <span id="balanceValue">Loading...</span>`;
+
+    const res = await fetch(`${BASE_URL}/api/wallet`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch wallet');
+
+    const data = await res.json();
+
+    // Update only the value dynamically
+    const balanceValueEl = document.getElementById('balanceValue');
+    if (data && typeof data.balance === 'number') {
+      walletBalance = data.balance;
+      balanceValueEl.textContent = `₦${walletBalance.toLocaleString()}`;
+    } else {
+      console.warn('Unexpected wallet response:', data);
+      balanceValueEl.textContent = `₦0`;
+    }
+
+  } catch (err) {
+    console.error('Wallet fetch error:', err);
+    const balanceValueEl = document.getElementById('balanceValue');
+    if (balanceValueEl) {
+      balanceValueEl.textContent = '₦0';
+    } else {
+      paymentBalance.innerHTML = `Wallet Balance: <span id="balanceValue">₦0</span>`;
+    }
+  }
+}
+
+
+// Buy Data link
+document.getElementById('buyAirtimeLink').addEventListener('click', () => {
+  window.location.href = 'airtime';
+});
+
+
+
+// 3️⃣ LOAD FREQUENT NUMBERS (fixed)
+async function loadFrequentNumbers() {
+  try {
+    const res = await fetch(`${BASE_URL}/api/frequent-numbers?type=data`, { credentials: 'include' });
+    const data = await res.json();
+    frequentNumbers.innerHTML = '';
+
+    if (data.status === 'success' && Array.isArray(data.frequentNumbers) && data.frequentNumbers.length) {
+      const sorted = data.frequentNumbers.sort((a, b) => b.count - a.count);
+      sorted.forEach(n => {
+        const div = document.createElement('div');
+        div.className = 'number-btn';
+        div.textContent = n.number;
+        div.title = `Used ${n.count} times`;
+        div.onclick = () => phoneInput.value = n.number;
+        frequentNumbers.appendChild(div);
+      });
+    } else {
+      frequentNumbers.innerHTML = '<p style="opacity:0.6;">No saved numbers yet</p>';
+    }
+  } catch (err) {
+    console.error('Frequent numbers error:', err);
+    frequentNumbers.innerHTML = '<p style="color:red;">Failed to load numbers</p>';
+  }
+}
+
+
+// 4️⃣ LOAD DATA PLANS BY NETWORK
+async function loadPlansForNetwork(network) {
+  planList.innerHTML = '<p>Loading plans...</p>';
+  try {
+    const res = await fetch(`${BASE_URL}/api/user/pricing?network=${encodeURIComponent(network)}`, { credentials: 'include' });
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('Invalid response');
+
+    plansByCategory = { night: [], weekend: [], direct: [], sme: [], others: [] };
+    data.forEach(plan => {
+      const cat = ['night', 'weekend', 'direct', 'sme'].includes(plan.category?.toLowerCase()) ? plan.category.toLowerCase() : 'others';
+      plansByCategory[cat].push(plan);
+    });
+    loadPlans();
+  } catch (err) {
+    planList.innerHTML = '<p style="color:red;">Failed to load plans.</p>';
+  }
+}
+
+// 5️⃣ RENDER PLANS
+function loadPlans() {
+  const plans = plansByCategory[selectedCategory] || [];
+  planList.innerHTML = '';
+
+  if (selectedPlan) {
+    planLabel.textContent = 'Selected Plan';
+    const div = document.createElement('div');
+    div.className = 'plan-item selected';
+    div.innerHTML = `<span>${selectedPlan.display_name}</span><span>₦${selectedPlan.price}</span>`;
+    planList.appendChild(div);
+    changePlanBtn.style.display = 'block';
+    return;
+  }
+
+  planLabel.textContent = 'Available Plans';
+  changePlanBtn.style.display = 'none';
+  plans.forEach(plan => {
+    const div = document.createElement('div');
+    div.className = 'plan-item';
+    div.innerHTML = `<span>${plan.display_name}</span><span>₦${plan.price}</span>`;
+    div.onclick = () => { selectedPlan = plan; loadPlans(); };
+    planList.appendChild(div);
+  });
+}
+
+// 6️⃣ PURCHASE FUNCTION
+async function purchaseData() {
+  if (!selectedPlan) return alert('Please select a plan');
+  const phone = phoneInput.value.trim();
+  if (!phone) return alert('Please enter phone number');
+
+  buyBtn.disabled = true;
+  const spinner = document.createElement('span');
+  spinner.className = 'spinner';
+  buyBtn.textContent = 'Processing';
+  buyBtn.appendChild(spinner);
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/data/purchase`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        network: selectedNetwork,
+        phone,
+        variation_code: selectedPlan.variationCode
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      renderReceipt(data.transaction);
+    } else {
+      alert(data.error || data.message || 'Purchase failed');
+    }
+  } catch (err) {
+    alert('Network error during purchase');
+  } finally {
+    buyBtn.disabled = false;
+    buyBtn.textContent = 'Buy Data';
+  }
+}
+
+// 7️⃣ RENDER RECEIPT
+function renderReceipt(tx) {
+  receiptContainer.innerHTML = `
+    <div class="receipt">
+      <h3>✅ Purchase Successful</h3>
+      <p><strong>Network:</strong> ${selectedNetwork.toUpperCase()}</p>
+      <p><strong>Phone:</strong> ${tx.phone}</p>
+      <p><strong>Amount:</strong> ₦${tx.amount}</p>
+      <p><strong>Description:</strong> ${tx.description}</p>
+      <p><strong>Status:</strong> ${tx.status}</p>
+      <p><strong>Reference:</strong> ${tx.reference}</p>
+      <p><strong>Date:</strong> ${new Date(tx.createdAt).toLocaleString()}</p>
+    </div>
+  `;
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+// EVENT LISTENERS
+document.querySelectorAll('.network-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.network-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedNetwork = btn.dataset.network;
+    selectedPlan = null;
+    loadPlansForNetwork(selectedNetwork);
+  };
+});
+
+document.querySelectorAll('.category-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedCategory = btn.dataset.category;
+    selectedPlan = null;
+    loadPlans();
+  };
+});
+
+changePlanBtn.onclick = () => { selectedPlan = null; loadPlans(); };
+buyBtn.onclick = purchaseData;
+
+document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.getAttribute('data-target');
+    if (target) window.location.href = target;
+  });
+});
+
+
+// INIT
+(async () => {
+  await checkAuth();
+  await loadWallet();
+  await loadFrequentNumbers();
+  await loadPlansForNetwork(selectedNetwork);
+})();
+</script>
+</body>
+</html>
