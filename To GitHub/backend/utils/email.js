@@ -1,29 +1,18 @@
-// utils/email.js
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS
-  },
-  socketTimeout: 15000
-});
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html }) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"Recharja" <${process.env.MAIL_USER}>`,
+    await resend.emails.send({
+      from: 'Recharja <onboarding@resend.dev>',
       to,
       subject,
-      html
+      html,
     });
-    console.log('✅ Email sent:', info.messageId);
+    console.log('✅ Email sent via Resend');
     return true;
   } catch (err) {
-    console.error('❌ Email send error:', err.message);
+    console.error('❌ Resend send error:', err);
     return false;
   }
 };
