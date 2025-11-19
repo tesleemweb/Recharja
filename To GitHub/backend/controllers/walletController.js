@@ -74,9 +74,11 @@ exports.fundWallet = async (req, res) => {
     );
 
     return res.json({
-  access_code: data.data.access_code,
-  reference: data.data.reference,
-  amount: amt});
+      authorization_url: data.data.authorization_url,
+      access_code: data.data.access_code,
+      reference
+    });
+
   } catch (err) {
     console.error('fundWallet error:', err.response?.data || err.message);
     return res.status(502).json({ message: 'Could not initialize payment' });
