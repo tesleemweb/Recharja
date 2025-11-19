@@ -73,7 +73,10 @@ exports.fundWallet = async (req, res) => {
       { headers: { Authorization: `Bearer ${PAYSTACK_SECRET}` } }
     );
 
-    return res.json({ authorization_url: data.data.authorization_url });
+    return res.json({
+  access_code: data.data.access_code,
+  reference: data.data.reference,
+  amount: amt});
   } catch (err) {
     console.error('fundWallet error:', err.response?.data || err.message);
     return res.status(502).json({ message: 'Could not initialize payment' });
