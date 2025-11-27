@@ -7,6 +7,8 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
+    "@sendinblue/client": "^3.3.1",
     "axios": "^1.10.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
@@ -15,6 +17,7 @@
     "express": "^4.18.4",
     "express-rate-limit": "^7.5.0",
     "jsonwebtoken": "^9.0.2",
+    "moment-timezone": "^0.6.0",
     "mongoose": "^7.5.0",
     "node-cron": "^4.1.1",
     "nodemailer": "^7.0.3",
