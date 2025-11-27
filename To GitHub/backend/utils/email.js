@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
+  port: 587,
   secure: true,
   auth: {
     user: process.env.MAIL_USER,
@@ -29,3 +29,4 @@ const sendEmail = async ({ to, subject, html }) => {
 };
 
 module.exports = sendEmail;
+
